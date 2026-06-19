@@ -125,9 +125,7 @@ function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
     }
     const zoomW = Math.log2(vw / imageW);
     const zoomH = Math.log2(vh / imageH);
-    // Portrait mobile: contain (show full island). Landscape/desktop: cover (fill viewport).
-    const isPortraitMobile = vw <= 768 && vh > vw;
-    const zoom = isPortraitMobile ? Math.min(zoomW, zoomH) : Math.max(zoomW, zoomH);
+    const zoom = Math.min(zoomW, zoomH);
     map.setView([imageH / 2, imageW / 2], zoom, { animate: false });
   }, [map]);
   return null;
