@@ -12,7 +12,7 @@ interface MiniGameWidgetProps {
 export function MiniGameWidget({ gameState, startGame, stopGame, onOpenComingSoon }: MiniGameWidgetProps) {
   if (!gameState.isPlaying) {
     return (
-      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 minigame-container play-guesser-btn">
+      <div className="fixed bottom-4 left-[78px] md:left-1/2 md:-translate-x-1/2 md:bottom-6 z-40 minigame-container play-guesser-btn">
         <button 
           onClick={() => { import('./haptics').then(m => m.Haptics.heavy()); onOpenComingSoon?.('GUESSER MODE'); }}
           className="bg-pink-600 text-white font-bold rounded-full transition-all text-xs px-3 py-1.5 md:text-base md:px-6 md:py-3 haptic-btn"

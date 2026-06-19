@@ -358,139 +358,9 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* ============================================
-   TOP HEADER BUBBLE - RESPONSIVE
-   ============================================ */
-
-.top-header-bubble {
-  position: absolute !important;
-  top: 10px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 99 !important;
-  
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 12px !important;
-  margin-left: 0 !important;
-  
-  /* Matches left sidebar transparency */
-  background: rgba(15, 15, 15, 0.65) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 18px !important;
-  padding: 10px 16px !important;
-  width: max-content !important;
-  
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
-  
-  font-family: Arial, sans-serif;
-  flex-wrap: nowrap;
-  width: fit-content;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-}
-
-/* TOP RIGHT BUBBLE - CONTACT button area */
-.contact-button-wrapper {
-  position: absolute !important;
-  top: 0 !important;
-  right: 10px !important;
-  background: rgba(15, 15, 15, 0.65) !important;
-  backdrop-filter: blur(15px) !important;
-  -webkit-backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 20px !important;
-  padding: 12px 16px !important;
-  padding-top: 4px !important;
-  margin: 0 !important;
-  z-index: 999;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2) !important;
-  will-change: transform;
-  backface-visibility: hidden;
-  transition: all 0.2s ease;
-  transform: scale(0.85) !important;
-  transform-origin: top right !important;
-}
-
-.contact-button-wrapper:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  transform: translateY(-2px);
-}
-
-/* Mobile vertical - full header */
-@media (max-width: 768px) {
-  .top-header-bubble {
-    top: 8px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    border-radius: 20px !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 8px 12px;
-    gap: 6px;
-    font-size: 12px;
-  }
-  
-  .top-header-bubble .gta-3d-title {
-    font-size: 0.75rem !important;
-  }
-}
-
-/* Mobile horizontal - COMPACT & PINNED */
-@media (max-width: 768px) and (orientation: landscape) {
-  .top-header-bubble {
-    top: 6px;
-    padding: 6px 10px;
-    gap: 4px;
-    font-size: 10px;
-    max-height: 48px;
-    width: max-content;
-    overflow: hidden;
-  }
-  
-  .top-header-bubble .gta-3d-title {
-    font-size: 0.65rem !important;
-  }
-}
-
-/* =======================================================
-   TABLET OPTIMIZED DOCKED HEADER
-   ======================================================= */
-@media screen and (min-width: 768px) and (max-width: 1100px) {
-  .top-header-bubble {
-    position: fixed !important;
-    top: 0 !important; 
-    left: calc(var(--toolbar-width-tablet) - 1px) !important; 
-    margin-left: 0 !important;
-    width: -moz-fit-content !important;
-    width: fit-content !important; 
-    transform: none !important;
-    margin: 0 !important;
-    border-radius: 0 0 20px 0 !important; 
-    background: rgba(20, 20, 20, 0.4) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-top: none !important;
-    border-left: none !important;
-    padding: 12px 20px !important;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    gap: 20px !important;
-    z-index: 99 !important;
-    font-size: 16px !important;
-  }
-}
-
-/* Hide header when modals are open */
-.modal-open .top-header-bubble {
-  opacity: 0;
+/* Dim the top header bar slightly when modals are open */
+.modal-open header {
+  opacity: 0.6;
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
@@ -515,7 +385,7 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 8px 8px 24px 8px;
+  padding: 70px 8px 24px 8px;
   overflow-y: auto;
   overflow-x: hidden;
   
@@ -544,7 +414,7 @@ html, body, #root {
   .left-sidebar {
     height: 100dvh;
     width: var(--toolbar-width-mobile);
-    padding: 56px 4px 6px;
+    padding: 70px 4px 6px;
     gap: 3px;
     bottom: 0;
     overflow-y: auto;

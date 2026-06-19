@@ -40,26 +40,19 @@ export function LaunchCountdown() {
     return () => clearInterval(countdownFunction);
   }, []);
 
+  const formatNumber = (num: number) => num.toString().padStart(2, '0');
+
   if (timeLeft.launched) {
     return (
-      <div className="flex items-center gap-1.5 sm:gap-3">
-        <img src="/a992d144-4edd-4397-bdae-5a039dcace5c.png" alt="VI" className="h-[16px] sm:h-[24px] object-contain" />
-        <span className="gta-3d-title text-[0.9rem] sm:text-[1.4rem]">LAUNCHED!</span>
-      </div>
+      <span className="gta-3d-title text-sm sm:text-base font-black text-white [text-shadow:_2px_2px_0_rgb(0_0_0)]">
+        LAUNCHED!
+      </span>
     );
   }
 
-  const formatNumber = (num: number) => num.toString().padStart(2, '0');
-
   return (
-    <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
-      {/* Show VI image on both mobile and desktop */}
-      <img src="/a992d144-4edd-4397-bdae-5a039dcace5c.png" alt="VI" className="block h-[24px] sm:h-[36px] md:h-[32px] lg:h-[72px] xl:h-[96px] object-contain landscape:h-[20px]" />
-      
-      {/* Responsive countdown text */}
-      <span className="gta-3d-title text-xl md:text-2xl lg:text-5xl xl:text-6xl tracking-[1px] sm:tracking-[3px] font-black tabular-nums text-white [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg">
-        {timeLeft.days}:{formatNumber(timeLeft.hours)}:{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}
-      </span>
-    </div>
+    <span className="gta-3d-title text-sm sm:text-base lg:text-xl tracking-[1px] font-black tabular-nums text-white [text-shadow:_2px_2px_0_rgb(0_0_0)] landscape:text-xs">
+      {timeLeft.days}:{formatNumber(timeLeft.hours)}:{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}
+    </span>
   );
 }
