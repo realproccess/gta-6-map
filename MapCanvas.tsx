@@ -129,6 +129,7 @@ function fitMapToContainer(map: L.Map, bounds: L.LatLngBoundsExpression) {
 function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
+    if (mapHasUserInteracted) return;
     fitMapToContainer(map, bounds);
   }, [map]);
   return null;
@@ -139,6 +140,8 @@ function OrientationHandler({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   useEffect(() => {
     const onOrientationChange = () => {
       setTimeout(() => {
+        // Reset interaction flag so the refit after rotation always runs
+        mapHasUserInteracted = false;
         map.invalidateSize();
         fitMapToContainer(map, bounds);
       }, 300);
@@ -183,6 +186,12 @@ function MapEventsHandler({ gameState, activeTool, handleMapClick, handleMouseMo
   }, [activeTool, map]);
 
   useMapEvents({
+    dragstart() {
+      mapHasUserInteracted = true;
+    },
+    zoomstart() {
+      mapHasUserInteracted = true;
+    },
     click(e) {
       if (gameState.isPlaying && !gameState.userGuess) {
         handleMapClick(e);
@@ -220,9 +229,12 @@ interface MapCanvasProps {
   drawingsRefresher?: number;
 }
 
+// Set to true once the user has manually panned or zoomed — prevents fitMapToContainer
+// from snapping back to the initial view on any subsequent re-render.
+let mapHasUserInteracted = false;
+
 const crs = L.CRS.Simple;
 const imageBounds: L.LatLngBoundsExpression = [[0, 0], [2048, 1488]];
-const movementBounds: L.LatLngBoundsExpression = [[-2000, -2000], [4000, 3488]];
 const mapWidth = 1488;
 const mapHeight = 2048;
 const gridSize = 500;
@@ -362,12 +374,10 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
 
   return (
     <div id="map" className="absolute inset-0 z-0 bg-transparent app-theme-dimmer map-container">
-      <MapContainer 
+      <MapContainer
         center={[1024, 744]}
         zoom={-1}
         crs={crs}
-        bounds={imageBounds}
-        maxBounds={movementBounds}
         maxZoom={4}
         minZoom={-3}
         zoomSnap={0.1}
