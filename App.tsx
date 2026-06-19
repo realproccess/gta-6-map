@@ -5,7 +5,7 @@
 
 import React, { useState, Suspense, lazy } from 'react';
 import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, LogOut, Mail } from 'lucide-react';
-import { MapCanvas } from './components/MapCanvas';
+import { MapCanvas } from './MapCanvas';
 
 import { Pin, GameState } from './types';
 
