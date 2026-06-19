@@ -31,7 +31,6 @@ export const validateEmail = (email: string): boolean => {
 export const loginUser = async (email: string, password: string) => {
   // TODO: Implement Supabase login
   // const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  console.log('Login placeholder for:', email);
   return { success: true, message: 'Login infrastructure ready' };
 };
 
@@ -59,6 +58,5 @@ export const registerEmail = async (email: string): Promise<{ success: boolean; 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   // TODO: Fetch from Supabase 'profiles' table
   // const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
-  console.log('Fetching profile placeholder for:', userId);
   return null;
 };

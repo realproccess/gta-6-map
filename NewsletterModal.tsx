@@ -58,8 +58,19 @@ export default function NewsletterModal({ isOpen, onClose }: NewsletterModalProp
           throw new Error('File size exceeds 5MB limit.');
         }
 
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        // Allowlist of safe MIME types — reject anything that could be executed
+        // or rendered as HTML/script (svg, html, js, etc.)
+        const ALLOWED_MIME_TYPES = new Set([
+          'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+          'application/pdf',
+        ]);
+        if (!ALLOWED_MIME_TYPES.has(file.type)) {
+          throw new Error('Unsupported file type. Please upload an image (JPEG, PNG, GIF, WEBP) or PDF.');
+        }
+
+        const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
+        // Use cryptographically random UUID instead of Math.random()
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
         
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('feedback-attachment')
@@ -167,7 +178,7 @@ export default function NewsletterModal({ isOpen, onClose }: NewsletterModalProp
               <input 
                 type="file" 
                 className="hidden" 
-                accept="image/*,.pdf,.doc,.docx"
+                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
                     setFile(e.target.files[0]);

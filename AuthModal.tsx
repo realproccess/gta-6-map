@@ -121,10 +121,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       }
     } catch (err: any) {
       const rawMsg = err.message?.toLowerCase() || '';
-      console.error('[Auth] error message:', err.message);
-      console.error('[Auth] status:', err.status);
-      console.error('[Auth] code:', err.code);
-      console.error('[Auth] full:', err);
+      // Log code only — never log the full error object or user input in production
+      if (import.meta.env.DEV) {
+        console.error('[Auth] code:', err.code, '| status:', err.status, '| msg:', err.message);
+      }
 
       if (rawMsg.includes('rate limit')) {
         setErrorMsg('Too many requests — wait a minute and try again.');
@@ -133,9 +133,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         setTimeout(() => handleViewToggle('signin'), 2000);
       } else if (rawMsg.includes('invalid login credentials')) {
         setErrorMsg('Wrong email or password.');
+      } else if (rawMsg.includes('email not confirmed')) {
+        setErrorMsg('Please confirm your email before signing in.');
       } else {
-        // Always show the real Supabase message so we can diagnose it
-        setErrorMsg(err.message || 'Unknown error — check the browser console.');
+        setErrorMsg('Something went wrong. Please try again.');
       }
     } finally {
       setLoading(false);

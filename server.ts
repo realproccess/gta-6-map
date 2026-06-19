@@ -1,4 +1,6 @@
+import crypto from 'crypto';
 import express from 'express';
+import helmet from 'helmet';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { createClient } from '@supabase/supabase-js';
@@ -8,21 +10,30 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// Initialize Supabase. Use service role key if available, else anon key.
-// Ko-fi webhooks need to bypass RLS to insert into the supporters table.
+// ── Fail-fast on missing required server secrets ──────────────────────────────
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-// Parse urlencoded bodies (Ko-fi sends application/x-www-form-urlencoded)
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('[startup] FATAL: VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must both be set.');
+  process.exit(1);
+}
+
+// Service role key is required so the Ko-fi webhook can bypass RLS.
+// Never fall back to the anon key — that would silently break RLS enforcement.
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// ── Security headers (helmet defaults cover CSP, HSTS, X-Frame-Options, etc.) ─
+app.use(helmet());
+
+// ── Body parsers ──────────────────────────────────────────────────────────────
+// Ko-fi sends application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-// Also parse JSON just in case
 app.use(express.json());
 
-// API route for Ko-fi webhook
+// ── Ko-fi webhook ─────────────────────────────────────────────────────────────
 app.post('/api/webhook/kofi', async (req, res) => {
   try {
-    // Ko-fi sends the payload in a 'data' field as a JSON string
     const dataStr = req.body.data;
     if (!dataStr) {
       return res.status(400).send('No data field found');
@@ -30,30 +41,49 @@ app.post('/api/webhook/kofi', async (req, res) => {
 
     const payload = JSON.parse(dataStr);
 
-    // Filter out private donations or missing names/amounts
+    // Verify the Ko-fi verification token to reject forged webhook calls.
+    // Set KOFI_VERIFICATION_TOKEN in your environment to the value shown in
+    // your Ko-fi dashboard under: More > API (Webhooks) > Verification Token.
+    const expectedToken = process.env.KOFI_VERIFICATION_TOKEN;
+    if (expectedToken) {
+      const receivedToken = payload.verification_token ?? '';
+      // Use constant-time comparison to prevent timing-based token guessing.
+      const expected = Buffer.from(expectedToken);
+      const received = Buffer.from(receivedToken);
+      const tokensMatch =
+        expected.length === received.length &&
+        crypto.timingSafeEqual(expected, received);
+
+      if (!tokensMatch) {
+        console.warn('[kofi] Rejected webhook: invalid verification token');
+        return res.status(401).send('Unauthorized');
+      }
+    } else {
+      // Warn loudly in logs but don't hard-block — allows local development
+      // without a Ko-fi account. Set KOFI_VERIFICATION_TOKEN in production.
+      console.warn('[kofi] WARNING: KOFI_VERIFICATION_TOKEN is not set. Webhook is unauthenticated.');
+    }
+
     if (payload.is_public === true) {
       const { from_name, amount, message } = payload;
-      
+
       const { error } = await supabase
         .from('supporters')
         .insert([{
           name: from_name,
           amount: parseFloat(amount) || 0,
           message: message || '',
-          // created_at is handled by the database default
         }]);
 
       if (error) {
-        console.error('Error inserting supporter:', error);
+        console.error('[kofi] Error inserting supporter:', error.message);
       }
     }
 
-    // Must return 200 OK so Ko-fi knows it was received
+    // Ko-fi expects 200 OK to acknowledge receipt.
     res.status(200).send('OK');
   } catch (error) {
-    console.error('Webhook error:', error);
-    // Even on error, it's often good practice to return 200 so Ko-fi doesn't keep retrying excessively,
-    // but returning 500 helps debugging if needed.
+    console.error('[kofi] Webhook error:', error);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -68,7 +98,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
