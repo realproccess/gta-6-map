@@ -82,6 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           email: cleanEmail,
           password: cleanPassword,
           options: {
+            emailRedirectTo: window.location.origin,
             data: { username: cleanUsername },
           },
         });
@@ -124,7 +125,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       const rawMsg = err.message?.toLowerCase() || '';
 
       // Intercept and rewrite errors gracefully based on what we saw in Screen recording 2026-06-03 1.26.31 AM.webm
-      if (rawMsg.includes('rate limit')) {
+      if (rawMsg.includes('invalid path') || rawMsg.includes('invalid url') || rawMsg.includes('redirect')) {
+        setErrorMsg('Sign up is temporarily unavailable. Please try again or contact support.');
+      } else if (rawMsg.includes('rate limit')) {
         setErrorMsg('Whoops! Too many requests. Please wait a minute or try signing in with Google!');
       } else if (rawMsg.includes('already registered') || rawMsg.includes('user already exists') || rawMsg.includes('exists')) {
         setErrorMsg('An account with this email already exists. Please sign in!');
