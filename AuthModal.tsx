@@ -82,7 +82,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
           email: cleanEmail,
           password: cleanPassword,
           options: {
-            emailRedirectTo: window.location.origin,
             data: { username: cleanUsername },
           },
         });
@@ -121,24 +120,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         onClose(); // Close modal on success
       }
     } catch (err: any) {
-      console.error('Auth Error — full object:', err);
-      console.error('Auth Error — message:', err.message);
-      console.error('Auth Error — status:', err.status);
-      console.error('Auth Error — code:', err.code);
-      console.error('Auth Error — details:', JSON.stringify(err, null, 2));
       const rawMsg = err.message?.toLowerCase() || '';
+      console.error('[Auth] error message:', err.message);
+      console.error('[Auth] status:', err.status);
+      console.error('[Auth] code:', err.code);
+      console.error('[Auth] full:', err);
 
       if (rawMsg.includes('rate limit')) {
-        setErrorMsg('Whoops! Too many requests. Please wait a minute or try signing in with Google!');
+        setErrorMsg('Too many requests — wait a minute and try again.');
       } else if (rawMsg.includes('already registered') || rawMsg.includes('user already exists') || rawMsg.includes('exists')) {
         setErrorMsg('An account with this email already exists. Please sign in!');
-        setTimeout(() => {
-          handleViewToggle('signin');
-        }, 2000);
+        setTimeout(() => handleViewToggle('signin'), 2000);
       } else if (rawMsg.includes('invalid login credentials')) {
-        setErrorMsg('Invalid login credentials. Please check your email or password!');
+        setErrorMsg('Wrong email or password.');
       } else {
-        setErrorMsg(`Error: ${err.message || 'Unknown error'}`);
+        // Always show the real Supabase message so we can diagnose it
+        setErrorMsg(err.message || 'Unknown error — check the browser console.');
       }
     } finally {
       setLoading(false);
