@@ -94,7 +94,7 @@ export function CharactersModal({ isOpen, onClose }: { isOpen: boolean; onClose:
           
           <button 
             onClick={() => {
-              import('../lib/haptics').then(m => m.Haptics.light());
+              import('./haptics').then(m => m.Haptics.light());
               setZoomedChar(null);
             }}
             className="fixed top-4 left-4 z-[100001] bg-black/50 hover:bg-black border border-white/20 p-2 sm:px-4 sm:py-2 rounded-full text-white flex items-center gap-2 haptic-btn"
@@ -105,7 +105,7 @@ export function CharactersModal({ isOpen, onClose }: { isOpen: boolean; onClose:
           
           <button 
             onClick={() => {
-              import('../lib/haptics').then(m => m.Haptics.light());
+              import('./haptics').then(m => m.Haptics.light());
               handleCloseAll();
             }}
             className="fixed top-4 right-4 z-[100001] bg-black/50 hover:bg-black border border-white/20 p-2 sm:px-4 sm:py-2 rounded-full text-white flex items-center gap-2 haptic-btn"

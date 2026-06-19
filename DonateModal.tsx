@@ -15,7 +15,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
   if (!isOpen) return null;
 
   const handleClose = () => {
-    import('../lib/haptics').then(m => m.Haptics.light());
+    import('./haptics').then(m => m.Haptics.light());
     setShowPayment(false);
     setIsLoading(true);
     onClose();
@@ -29,7 +29,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
         {showPayment && (
           <button 
             onClick={() => {
-              import('../lib/haptics').then(m => m.Haptics.light());
+              import('./haptics').then(m => m.Haptics.light());
               setShowPayment(false);
             }}
             className="absolute top-4 sm:top-6 left-4 sm:left-6 text-white/70 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10 haptic-btn"
@@ -60,7 +60,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
 
             <button
               onClick={() => {
-                import('../lib/haptics').then(m => m.Haptics.success());
+                import('./haptics').then(m => m.Haptics.success());
                 setShowPayment(true);
               }}
               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 rounded-xl font-black italic text-sm sm:text-lg tracking-wider text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_4px_14px_rgba(244,63,94,0.4)] haptic-btn"

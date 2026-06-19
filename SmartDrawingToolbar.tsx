@@ -29,11 +29,11 @@ export function SmartDrawingToolbar({ activeTool, setActiveTool, activeColor, se
         <img src="/ed5cf9a9-0d87-4a55-aaa8-beb896d10005.png" alt="Logo" className="w-full h-full object-contain scale-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
       </div>
 
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.light()); onOpenNews?.() }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.light()); onOpenNews?.() }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
         <Newspaper size={20} />
         <span className="text-[8.5px] font-bold uppercase tracking-wider text-white text-center leading-tight">News</span>
       </button>
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.heavy()); onOpenCharacters?.() }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.heavy()); onOpenCharacters?.() }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
         <Users size={20} />
         <span className="text-[7.5px] font-bold uppercase tracking-wider text-white text-center leading-tight">Characters</span>
       </button>
@@ -96,19 +96,19 @@ export function SmartDrawingToolbar({ activeTool, setActiveTool, activeColor, se
       <div className="w-8 h-px bg-white/20 mt-2 mb-1" />
 
       {/* 7. Extra Tools Below */}
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('MONEY METHODS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('MONEY METHODS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
         <Banknote size={20} />
         <span className="text-[7.5px] font-bold uppercase tracking-wider text-white text-center leading-tight">Money Methods</span>
       </button>
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('HEISTS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('HEISTS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
         <ShieldAlert size={20} />
         <span className="text-[8px] font-bold uppercase tracking-wider text-white text-center leading-tight">Heists</span>
       </button>
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('VEHICLES') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('VEHICLES') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white">
         <Car size={20} />
         <span className="text-[8px] font-bold uppercase tracking-wider text-white text-center leading-tight">Cars</span>
       </button>
-      <button onClick={() => { import('../lib/haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('WEAPONS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white mb-2">
+      <button onClick={() => { import('./haptics').then(m => m.Haptics.light()); onOpenComingSoon?.('WEAPONS') }} className="tool-btn haptic-btn tool-icon-btn relative shrink-0 flex flex-col items-center justify-center gap-1 p-2 w-14 rounded-xl transition-all duration-200 group text-white/70 hover:bg-white/15 hover:text-white mb-2">
         <Crosshair size={20} />
         <span className="text-[8px] font-bold uppercase tracking-wider text-white text-center leading-tight">Weapons</span>
       </button>
@@ -132,7 +132,7 @@ function ToolButton({ icon, label, active, onClick, activeColor, setActiveColor,
   return (
     <div className="relative group/tool w-full flex flex-col items-center justify-center">
       <button 
-        onClick={() => { import('../lib/haptics').then(m => m.Haptics.medium()); onClick(); }}
+        onClick={() => { import('./haptics').then(m => m.Haptics.medium()); onClick(); }}
         className={`tool-btn haptic-btn tool-icon-btn relative w-14 rounded-xl flex flex-col items-center justify-center gap-1 p-2 transition-all duration-200 group z-10 ${active ? 'bg-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] text-white' : 'text-white/70 hover:bg-white/15 hover:text-white'}`}
       >
         {active && activeColor ? React.cloneElement(icon as React.ReactElement, { color: activeColor }) : icon}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Paperclip, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from './supabaseClient';
 
 interface NewsletterModalProps {
   isOpen: boolean;
@@ -25,7 +25,7 @@ export default function NewsletterModal({ isOpen, onClose }: NewsletterModalProp
 
     try {
       setEmailStatus('loading');
-      import('../lib/haptics').then(m => m.Haptics.heavy());
+      import('./haptics').then(m => m.Haptics.heavy());
 
       const { error } = await supabase
         .from('subscribers')
@@ -49,7 +49,7 @@ export default function NewsletterModal({ isOpen, onClose }: NewsletterModalProp
 
     try {
       setFeedbackStatus('loading');
-      import('../lib/haptics').then(m => m.Haptics.heavy());
+      import('./haptics').then(m => m.Haptics.heavy());
 
       let file_url = null;
 

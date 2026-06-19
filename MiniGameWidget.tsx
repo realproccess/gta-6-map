@@ -14,7 +14,7 @@ export function MiniGameWidget({ gameState, startGame, stopGame, onOpenComingSoo
     return (
       <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 minigame-container play-guesser-btn">
         <button 
-          onClick={() => { import('../lib/haptics').then(m => m.Haptics.heavy()); onOpenComingSoon?.('GUESSER MODE'); }}
+          onClick={() => { import('./haptics').then(m => m.Haptics.heavy()); onOpenComingSoon?.('GUESSER MODE'); }}
           className="bg-pink-600 text-white font-bold rounded-full transition-all text-xs px-3 py-1.5 md:text-base md:px-6 md:py-3 haptic-btn"
         >
           PLAY GUESSER MODE
