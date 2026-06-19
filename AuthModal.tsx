@@ -121,13 +121,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
         onClose(); // Close modal on success
       }
     } catch (err: any) {
-      console.error('Auth Error Object:', err);
+      console.error('Auth Error — full object:', err);
+      console.error('Auth Error — message:', err.message);
+      console.error('Auth Error — status:', err.status);
+      console.error('Auth Error — code:', err.code);
+      console.error('Auth Error — details:', JSON.stringify(err, null, 2));
       const rawMsg = err.message?.toLowerCase() || '';
 
-      // Intercept and rewrite errors gracefully based on what we saw in Screen recording 2026-06-03 1.26.31 AM.webm
-      if (rawMsg.includes('invalid path') || rawMsg.includes('invalid url') || rawMsg.includes('redirect')) {
-        setErrorMsg('Sign up is temporarily unavailable. Please try again or contact support.');
-      } else if (rawMsg.includes('rate limit')) {
+      if (rawMsg.includes('rate limit')) {
         setErrorMsg('Whoops! Too many requests. Please wait a minute or try signing in with Google!');
       } else if (rawMsg.includes('already registered') || rawMsg.includes('user already exists') || rawMsg.includes('exists')) {
         setErrorMsg('An account with this email already exists. Please sign in!');
@@ -137,7 +138,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMo
       } else if (rawMsg.includes('invalid login credentials')) {
         setErrorMsg('Invalid login credentials. Please check your email or password!');
       } else {
-        setErrorMsg(err.message || 'An unexpected error occurred. Please try again.');
+        setErrorMsg(`Error: ${err.message || 'Unknown error'}`);
       }
     } finally {
       setLoading(false);
