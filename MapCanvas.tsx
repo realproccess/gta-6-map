@@ -111,6 +111,23 @@ function TouchDrawHandler({
   return null;
 }
 
+// Use window.innerHeight instead of dvh so Safari landscape gets the real available
+// pixels after the address bar, without relying on env(safe-area-inset-*).
+function updateContainerHeight(map: L.Map) {
+  const outer = map.getContainer().parentElement as HTMLElement | null;
+  if (!outer) return;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const isMobileLandscape = w > h && Math.min(w, h) <= 768;
+  if (isMobileLandscape) {
+    // offsetTop is set by CSS (var(--header-height-mobile-h) = 65px); read it live.
+    const top = outer.offsetTop || 65;
+    outer.style.height = `${h - top}px`;
+  } else {
+    outer.style.height = '';
+  }
+}
+
 function fitMapToContainer(map: L.Map, bounds: L.LatLngBoundsExpression) {
   const b = L.latLngBounds(bounds as any);
   const imageW = b.getEast() - b.getWest();
@@ -138,14 +155,26 @@ function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
 function OrientationHandler({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
+    // Correct container height on mount; CSS dvh can lag behind in Safari landscape.
+    updateContainerHeight(map);
+    map.invalidateSize();
+    if (!mapHasUserInteracted) {
+      fitMapToContainer(map, bounds);
+    }
+
     const onOrientationChange = () => {
       setTimeout(() => {
-        // Reset interaction flag so the refit after rotation always runs
-        mapHasUserInteracted = false;
+        updateContainerHeight(map);
         map.invalidateSize();
-        fitMapToContainer(map, bounds);
+        if (mapHasUserInteracted) {
+          // Restore where the user was looking — don't hijack their position.
+          map.setView(mapLastCenter, mapLastZoom, { animate: false });
+        } else {
+          fitMapToContainer(map, bounds);
+        }
       }, 300);
     };
+
     window.addEventListener('orientationchange', onOrientationChange);
     return () => window.removeEventListener('orientationchange', onOrientationChange);
   }, [map, bounds]);
@@ -192,6 +221,10 @@ function MapEventsHandler({ gameState, activeTool, handleMapClick, handleMouseMo
     zoomstart() {
       mapHasUserInteracted = true;
     },
+    moveend() {
+      const c = map.getCenter();
+      mapLastCenter = [c.lat, c.lng];
+    },
     click(e) {
       if (gameState.isPlaying && !gameState.userGuess) {
         handleMapClick(e);
@@ -211,6 +244,7 @@ function MapEventsHandler({ gameState, activeTool, handleMapClick, handleMouseMo
       if (handleMouseUp) handleMouseUp(e);
     },
     zoomend() {
+      mapLastZoom = map.getZoom();
       if (setZoomLevel) setZoomLevel(map.getZoom());
     }
   });
@@ -229,9 +263,12 @@ interface MapCanvasProps {
   drawingsRefresher?: number;
 }
 
-// Set to true once the user has manually panned or zoomed — prevents fitMapToContainer
-// from snapping back to the initial view on any subsequent re-render.
+// Shared mutable state for cross-component coordination (single map instance).
+// Prevents fitMapToContainer from snapping back after user interaction, and
+// lets OrientationHandler restore the user's last position after rotation.
 let mapHasUserInteracted = false;
+let mapLastZoom = -2;
+let mapLastCenter: [number, number] = [1024, 744];
 
 const crs = L.CRS.Simple;
 const imageBounds: L.LatLngBoundsExpression = [[0, 0], [2048, 1488]];
