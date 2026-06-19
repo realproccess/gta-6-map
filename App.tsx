@@ -5,6 +5,7 @@
 
 import React, { useState, Suspense, lazy } from 'react';
 import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail } from 'lucide-react';
+import { Analytics, track } from '@vercel/analytics/react';
 import { MapCanvas } from './MapCanvas';
 
 import { Pin, GameState } from './types';
@@ -208,7 +209,7 @@ export default function App() {
             {!sessionUser && (
               <>
                 <button
-                  onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
+                  onClick={() => { track('signup_click'); import('./haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
                   className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-cyan-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
                 >
                   SIGN UP
@@ -239,7 +240,7 @@ export default function App() {
         setActiveColor={setActiveColor}
         clearDrawings={() => setDrawingsCount(c => c + 1)}
         onOpenCharacters={() => setIsCharactersOpen(prev => !prev)}
-        onOpenNews={() => setIsNewsOpen(prev => !prev)}
+        onOpenNews={() => { track('news_viewed'); setIsNewsOpen(prev => !prev); }}
         onOpenComingSoon={(title) => setComingSoonTitle(title)}
       />
 
@@ -324,6 +325,7 @@ export default function App() {
         />}
       </Suspense>
 
+      <Analytics />
     </div>
   );
 }

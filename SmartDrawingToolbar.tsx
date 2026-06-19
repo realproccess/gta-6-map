@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Ruler, CircleDashed, Brush, Trash2, MousePointer2, Users, Car, Crosshair, ShieldAlert, Newspaper, Banknote } from 'lucide-react';
+import { track } from '@vercel/analytics/react';
 
 interface SmartDrawingToolbarProps {
   activeTool: string;
@@ -53,7 +54,7 @@ export function SmartDrawingToolbar({ activeTool, setActiveTool, activeColor, se
       <ToolButton 
         icon={<Brush size={20} />} 
         label="DRAW BRUSH" 
-        onClick={() => setActiveTool('draw')} 
+        onClick={() => { track('draw_tool_used'); setActiveTool('draw'); }}
         active={activeTool === 'draw'}
         activeColor={activeColor}
         setActiveColor={setActiveColor}
