@@ -22,22 +22,22 @@ const INITIAL_PINS: Pin[] = [
 
 const CATEGORIES = ['location', 'landmark', 'leak', 'mission'];
 
-import { SmartDrawingToolbar } from './components/SmartDrawingToolbar';
-import { MiniGameWidget } from './components/MiniGameWidget';
-import { ViceDreamBackground } from './components/ViceDreamBackground';
+import { SmartDrawingToolbar } from './SmartDrawingToolbar';
+import { MiniGameWidget } from './MiniGameWidget';
+import { ViceDreamBackground } from './ViceDreamBackground';
 
-import { LaunchCountdown } from './components/LaunchCountdown';
-import { UserBubble } from './components/UserBubble';
-import { supabase } from './lib/supabase';
+import { LaunchCountdown } from './LaunchCountdown';
+import { UserBubble } from './UserBubble';
+import { supabase } from './supabaseClient';
 
-const SupportersSidebar = lazy(() => import('./components/SupportersSidebar').then(m => ({ default: m.SupportersSidebar })));
-const EcosystemSettings = lazy(() => import('./components/EcosystemSettings'));
-const AuthModal = lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
-const DonateModal = lazy(() => import('./components/DonateModal').then(m => ({ default: m.DonateModal })));
-const CharactersModal = lazy(() => import('./components/CharactersModal').then(m => ({ default: m.CharactersModal })));
-const NewsModal = lazy(() => import('./components/NewsModal'));
-const ComingSoonModal = lazy(() => import('./components/ComingSoonModal'));
-const NewsletterModal = lazy(() => import('./components/NewsletterModal'));
+const SupportersSidebar = lazy(() => import('./SupportersSidebar').then(m => ({ default: m.SupportersSidebar })));
+const EcosystemSettings = lazy(() => import('./EcosystemSettings'));
+const AuthModal = lazy(() => import('./AuthModal').then(m => ({ default: m.AuthModal })));
+const DonateModal = lazy(() => import('./DonateModal').then(m => ({ default: m.DonateModal })));
+const CharactersModal = lazy(() => import('./CharactersModal').then(m => ({ default: m.CharactersModal })));
+const NewsModal = lazy(() => import('./NewsModal'));
+const ComingSoonModal = lazy(() => import('./ComingSoonModal'));
+const NewsletterModal = lazy(() => import('./NewsletterModal'));
 
 const GAME_LOCATIONS = [
   { lat: 500, lng: 500, img: 'https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?w=500&q=80' },
@@ -201,7 +201,7 @@ export default function App() {
           {/* Navigation - Massive text for desktop */}
           <nav className="flex gap-2 sm:gap-4 md:gap-8 lg:gap-16 landscape:gap-4">
             <button 
-              onClick={() => { import('./lib/haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
+              onClick={() => { import('./haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
               className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-yellow-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
             >
               TIP
@@ -210,14 +210,14 @@ export default function App() {
             {!sessionUser && (
               <>
                 <button 
-                  onClick={() => { import('./lib/haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
+                  onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
                   className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-cyan-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
                 >
                   SIGN UP
                 </button>
                 
                 <button 
-                  onClick={() => { import('./lib/haptics').then(m => m.Haptics.light()); setAuthMode('signin'); setIsAuthModalOpen(true); }}
+                  onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signin'); setIsAuthModalOpen(true); }}
                   className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-pink-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
                 >
                   SIGN IN
@@ -273,7 +273,7 @@ export default function App() {
       >
         {/* CONTACT BUTTON */}
         <button 
-          onClick={() => { import('./lib/haptics').then(m => m.Haptics.light()); setIsNewsletterOpen(true); }}
+          onClick={() => { import('./haptics').then(m => m.Haptics.light()); setIsNewsletterOpen(true); }}
           className="group shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:scale-110 transition-transform haptic-btn"
           title="Contact"
         >
@@ -282,7 +282,7 @@ export default function App() {
 
         {/* SETTINGS GEAR BUTTON */}
         <button 
-          onClick={() => { import('./lib/haptics').then(m => m.Haptics.light()); setIsSettingsOpen(!isSettingsOpen); }}
+          onClick={() => { import('./haptics').then(m => m.Haptics.light()); setIsSettingsOpen(!isSettingsOpen); }}
           className="group shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:scale-110 transition-transform haptic-btn"
           title="Ecosystem Settings"
         >
@@ -291,7 +291,7 @@ export default function App() {
 
         {/* SUPPORT HEART BUTTON */}
         <button 
-          onClick={() => { import('./lib/haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
+          onClick={() => { import('./haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
           className="group shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:scale-110 transition-transform haptic-btn"
           title="Support the Project"
         >
