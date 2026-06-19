@@ -1,0 +1,2362 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
+@theme {
+  --color-brand-bg: #0A0A0A;
+  --color-brand-purple: #9B59B6;
+  --color-brand-pink: #FF6B9D;
+  --color-brand-gray: #1E1E1E;
+}
+
+/* --- 3D GTA STYLE LETTERING (FULL THICK) --- */
+.gta-3d-title {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffffff;
+  /* Multiple layered text-shadows create the thick 3D solid extrusion effect */
+  text-shadow: 
+    1px 1px 0px #000, 
+    2px 2px 0px #f43f5e, 
+    3px 3px 0px #f43f5e, 
+    4px 4px 0px #000,
+    5px 5px 0px #000,
+    6px 6px 10px rgba(0, 0, 0, 0.6);
+}
+
+.gta-3d-nav {
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #ffffff;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+  text-shadow: 
+    1px 1px 0px #000, 
+    2px 2px 0px #a855f7, 
+    3px 3px 0px #000;
+}
+
+.gta-3d-nav:hover {
+  transform: scale(1.05) translateY(-1px);
+  text-shadow: 
+    1px 1px 0px #000, 
+    2px 2px 0px #f43f5e, 
+    3px 3px 0px #000;
+}
+
+
+@layer base {
+  :root {
+    --bg-color: #0A0A0A;
+    --neon-purple: #9B59B6;
+    --neon-pink: #FF6B9D;
+  }
+  
+body {
+    @apply bg-brand-bg text-white antialiased w-screen h-screen m-0 p-0;
+    overflow-x: hidden;
+  }
+}
+
+/* Leaflet Dark Theme Overrides */
+.leaflet-container {
+  background: transparent !important;
+}
+#map, .map-container {
+  overflow: hidden !important;
+  border-radius: 16px;
+}
+.leaflet-popup-content-wrapper {
+  background: transparent !important;
+  color: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: inherit;
+}
+.leaflet-popup-tip {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: none;
+  border-left: none;
+  box-shadow: none !important;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Apply CSS filters onto your entire app based on state */
+.app-theme-dimmer {
+  transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: brightness(var(--map-brightness, 1)) saturate(var(--map-saturation, 1.1));
+}
+
+/* Smooth custom scrolling for the dashboard layout */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+
+/* Custom Numbered Dot Markers for Measurement Tool */
+.measure-marker-dot {
+    transition: transform 0.2s ease;
+}
+
+.measure-marker-dot:hover {
+    transform: scale(1.15);
+}
+
+.map-editable-bubble {
+    background: rgba(15, 15, 25, 0.95);
+    border: 2px solid #8a2be2;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.map-editable-bubble input {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    width: 100px;
+}
+
+.zoom-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Measurement Tooltip Fixes - Clear, Transparent, No White Border */
+.leaflet-tooltip.measure-distance-tooltip,
+.measure-distance-tooltip {
+    background: rgba(15, 15, 25, 0.65) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Remove default Leaflet tooltip arrow outline */
+.leaflet-tooltip-top.measure-distance-tooltip::before,
+.leaflet-tooltip-bottom.measure-distance-tooltip::before,
+.leaflet-tooltip-left.measure-distance-tooltip::before,
+.leaflet-tooltip-right.measure-distance-tooltip::before {
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+}
+
+/* Eraser Active State for Map Target Overlays */
+.eraser-target-hover:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff3333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H4"></path><path d="M20 13l-7-7-8 8a2 2 0 0 0 0 2.83l3.17 3.17A2 2 0 0 0 11 20h9"></path></svg>'), auto !important;
+    opacity: 0.5 !important;
+}
+
+/* Performance Mode Modifiers */
+.low-res-mode .app-theme-dimmer {
+    backdrop-filter: none !important;
+    background: transparent !important;
+}
+.low-res-mode * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* Legal Page Overlay (Full Screen) */
+.legal-page-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(10, 5, 15, 0.98); /* Deep dark background */
+    z-index: 10000; /* Must sit above everything else */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.legal-page-container {
+    background: #1a1a24;
+    border: 1px solid rgba(255, 105, 180, 0.3);
+    border-radius: 12px;
+    width: 800px;
+    max-width: 95vw;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    animation: slideUpFade 0.3s ease-out;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.legal-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px 12px 0 0;
+}
+
+.legal-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 20px;
+    letter-spacing: 2px;
+    margin-left: 20px;
+}
+
+.legal-back-btn {
+    background: rgba(255, 105, 180, 0.1);
+    color: #ff69b4;
+    border: 1px solid #ff69b4;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.legal-back-btn:hover {
+    background: #ff69b4;
+    color: #fff;
+}
+
+.legal-content {
+    padding: 30px;
+    overflow-y: auto;
+    color: #ccc;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.legal-content h3 {
+    color: #fff;
+    margin-top: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+}
+
+.legal-content p {
+    margin-bottom: 15px;
+}
+
+/* --- DARK MODE LOGIC --- */
+body.dark-theme::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* global whole-screen dimmer */
+    pointer-events: none;
+    z-index: 999999;
+}
+
+body.dark-theme {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a24) !important;
+}
+
+body.dark-theme .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+body.dark-theme .border-white\/10 {
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .bg-\[\#131316\]\/95,
+body.dark-theme .bg-\[\#140420\] {
+    background-color: rgba(10, 10, 15, 0.98) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .text-\[\#ff69b4\] {
+    color: #ff3399 !important;
+}
+
+body.dark-theme .from-\[\#8a2be2\]\/20 {
+    --tw-gradient-from: rgba(138,43,226,0.1) var(--tw-gradient-from-position);
+}
+
+body.dark-theme .to-\[\#ff69b4\]\/20 {
+    --tw-gradient-to: rgba(255,105,180,0.1) var(--tw-gradient-to-position);
+}
+
+
+/* ============================================
+   GLOBAL BASE STYLES & RESPONSIVE FOUNDATION
+   ============================================ */
+
+:root {
+  --header-height-mobile-v: 80px;
+  --header-height-mobile-h: 65px;
+  --header-height-tablet-v: 90px;
+  --header-height-tablet-h: 70px;
+  --toolbar-width-mobile: 70px;
+  --toolbar-width-tablet: 80px;
+  --z-map: 10;
+  --z-toolbar: 40;
+  --z-modals: 50;
+  --z-header: 45;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ============================================
+   TOP HEADER BUBBLE - RESPONSIVE
+   ============================================ */
+
+.top-header-bubble {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 99 !important;
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin-left: 0 !important;
+  
+  /* Matches left sidebar transparency */
+  background: rgba(15, 15, 15, 0.65) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+  padding: 10px 16px !important;
+  width: max-content !important;
+  
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  
+  font-family: Arial, sans-serif;
+  flex-wrap: nowrap;
+  width: fit-content;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* TOP RIGHT BUBBLE - CONTACT button area */
+.contact-button-wrapper {
+  position: absolute !important;
+  top: 0 !important;
+  right: 10px !important;
+  background: rgba(15, 15, 15, 0.65) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  padding: 12px 16px !important;
+  padding-top: 4px !important;
+  margin: 0 !important;
+  z-index: 999;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2) !important;
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: all 0.2s ease;
+  transform: scale(0.85) !important;
+  transform-origin: top right !important;
+}
+
+.contact-button-wrapper:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+/* Mobile vertical - full header */
+@media (max-width: 768px) {
+  .top-header-bubble {
+    top: 8px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 8px 12px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  
+  .top-header-bubble .gta-3d-title {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Mobile horizontal - COMPACT & PINNED */
+@media (max-width: 768px) and (orientation: landscape) {
+  .top-header-bubble {
+    top: 6px;
+    padding: 6px 10px;
+    gap: 4px;
+    font-size: 10px;
+    max-height: 48px;
+    width: max-content;
+    overflow: hidden;
+  }
+  
+  .top-header-bubble .gta-3d-title {
+    font-size: 0.65rem !important;
+  }
+}
+
+/* =======================================================
+   TABLET OPTIMIZED DOCKED HEADER
+   ======================================================= */
+@media screen and (min-width: 768px) and (max-width: 1100px) {
+  .top-header-bubble {
+    position: fixed !important;
+    top: 0 !important; 
+    left: calc(var(--toolbar-width-tablet) - 1px) !important; 
+    margin-left: 0 !important;
+    width: -moz-fit-content !important;
+    width: fit-content !important; 
+    transform: none !important;
+    margin: 0 !important;
+    border-radius: 0 0 20px 0 !important; 
+    background: rgba(20, 20, 20, 0.4) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: none !important;
+    border-left: none !important;
+    padding: 12px 20px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 20px !important;
+    z-index: 99 !important;
+    font-size: 16px !important;
+  }
+}
+
+/* Hide header when modals are open */
+.modal-open .top-header-bubble {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* ============================================
+   LEFT SIDEBAR TOOLBAR - RESPONSIVE
+   ============================================ */
+
+.left-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: var(--toolbar-width-mobile);
+  z-index: var(--z-toolbar);
+  
+  background-color: rgba(15, 15, 15, 0.65) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 8px 24px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* CRITICAL: Extend to bottom */
+  bottom: 0;
+}
+
+/* Tablet vertical - add scrolling container */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+  .left-sidebar {
+    width: var(--toolbar-width-tablet);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .left-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Mobile horizontal - CRITICAL: full height to bottom */
+@media (max-width: 768px) and (orientation: landscape) {
+  .left-sidebar {
+    height: 100dvh;
+    width: var(--toolbar-width-mobile);
+    padding: 56px 4px 6px;
+    gap: 3px;
+    bottom: 0;
+  }
+}
+
+/* Responsive sidebar blur */
+@media (max-width: 1024px) {
+  .left-sidebar {
+    background-color: rgba(20, 20, 20, 0.4) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+.left-sidebar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.left-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   MAP CONTAINER
+   ============================================ */
+
+.map-container {
+  position: absolute;
+  top: 0;
+  left: var(--toolbar-width-mobile);
+  width: calc(100% - var(--toolbar-width-mobile));
+  height: 100dvh;
+  z-index: var(--z-map);
+  will-change: transform;
+  transform: translateZ(0);
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+/* Adjust for tablet toolbar width */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .map-container {
+    left: var(--toolbar-width-tablet);
+    width: calc(100% - var(--toolbar-width-tablet));
+  }
+}
+
+/* ============================================
+   MODALS & OVERLAYS - PROPER Z-INDEXING
+   ============================================ */
+
+.modal-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 15px; /* Creates a larger invisible clickable area around the X */
+  cursor: pointer;
+  z-index: 9999; /* Ensures nothing blocks the hover/click */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-screen-image {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh; /* Prevents it from spilling off-screen */
+  object-fit: contain; /* CRITICAL: Forces the whole image to show */
+  background-color: rgba(0, 0, 0, 0.8); /* Optional: dark backdrop for any empty space */
+}
+
+.ui-panel,
+.character-card,
+.stay-updated-modal,
+.ko-fi-modal,
+.settings-modal-card,
+.auth-modal,
+.donate-modal,
+.news-modal,
+.coming-soon-modal,
+.newsletter-modal {
+  position: fixed;
+  z-index: var(--z-modals);
+  
+  /* Responsive sizing */
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+/* Mobile modal - fullscreen-ish */
+@media (max-width: 768px) {
+  .ui-panel,
+  .character-card,
+  .settings-modal-card {
+    width: 95vw !important;
+    height: auto;
+    max-height: 85vh;
+  }
+}
+
+/* Tablet modal - larger but not fullscreen */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .ui-panel,
+  .character-card,
+  .settings-modal-card {
+    width: 85vw !important;
+    height: auto;
+    max-height: 80vh;
+  }
+}
+
+/* Modal backdrop - hide top header */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modals) - 1);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* ============================================
+   RIGHT SIDE BUTTONS - RESPONSIVE
+   ============================================ */
+
+.right-side-buttons {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Mobile horizontal - adjust positioning */
+@media (max-width: 768px) and (orientation: landscape) {
+  .right-side-buttons {
+    right: 8px;
+    gap: 8px;
+    top: 50%;
+  }
+}
+
+/* ============================================
+   BOTTOM TOOLBAR / DRAWING CONTROLS
+   ============================================ */
+
+.bottom-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: var(--toolbar-width-mobile);
+  width: calc(100% - var(--toolbar-width-mobile));
+  height: auto;
+  z-index: 35;
+  
+  background-color: rgba(15, 15, 15, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 8px 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Mobile horizontal - CRITICAL: full width at bottom */
+@media (max-width: 768px) and (orientation: landscape) {
+  .bottom-toolbar {
+    left: 0;
+    width: 100%;
+    padding: 6px 8px 4px;
+    gap: 4px;
+    height: auto;
+    bottom: 0;
+  }
+}
+
+/* ============================================
+   COUNTDOWN TIMER - RESPONSIVE
+   ============================================ */
+
+.launch-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ec4899;
+}
+
+@media (max-width: 768px) {
+  .launch-countdown {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .launch-countdown {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+}
+
+/* ============================================
+   GAME WIDGET - RESPONSIVE
+   ============================================ */
+
+.mini-game-widget {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 30;
+  
+  max-width: 320px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .mini-game-widget {
+    bottom: 100px;
+    right: 10px;
+    max-width: calc(100vw - 60px);
+  }
+}
+
+/* Mobile horizontal - position above bottom toolbar */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mini-game-widget {
+    bottom: 70px;
+    right: 8px;
+    max-width: calc(100vw - 40px);
+  }
+}
+
+/* ============================================
+   BUTTON SIZING & SPACING
+   ============================================ */
+
+/* Toolbar buttons */
+.tool-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .tool-btn {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   SIGN OUT BUTTON - RESPONSIVE
+   ============================================ */
+
+.sign-out-button {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  z-index: 48;
+  
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .sign-out-button {
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 6px;
+  }
+}
+
+/* ============================================
+   LEAFLET OVERRIDES
+   ============================================ */
+
+.leaflet-container {
+  font-family: Arial, sans-serif;
+}
+
+.leaflet-control {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 8px !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(0, 0, 0, 0.9) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-open {
+  overflow-y: scroll;
+  position: fixed;
+  width: 100%;
+}
+
+/* ============================================
+   RESPONSIVE UTILITY CLASSES
+   ============================================ */
+
+/* =======================================================
+   MOBILE VERTICAL (PORTRAIT) REFINEMENTS
+   ======================================================= */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    /* 1. Shrink the Left Sidebar */
+    .left-sidebar { 
+        width: 55px !important; 
+        padding: 5px !important;
+    }
+    
+    /* Shrink the logo and icons inside the sidebar to fit the new width */
+    .left-sidebar .w-8 { width: 32px !important; height: 32px !important; }
+    .left-sidebar svg, .left-sidebar img { transform: scale(0.85) !important; }
+    .left-sidebar span { font-size: 9px !important; }
+
+    /* Map element wrapper */
+    .map-container { 
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important; /* Forces it past the yellow line */
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 0 !important; 
+    }     
+
+    /* Prevent the logo from clipping */
+    .vi-logo {
+        white-space: nowrap !important;
+        overflow: visible !important;
+        width: max-content !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* 2. Connect the top bubble seamlessly into the sidebar */
+    .top-header-bubble {
+        top: 0 !important;
+        left: 55px !important; 
+        transform: none !important;
+        width: max-content !important;
+        padding: 8px 10px !important;
+        
+        margin-left: 0 !important;
+        border-left: none !important;
+        border-top: none !important;
+        border-radius: 0 0 16px 0 !important; 
+        
+        /* Same background/blur as sidebar */
+        background: rgba(15, 15, 15, 0.65) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+    }
+
+    /* 3. Pulls contact button up flush alongside countdown */
+    .contact-button-wrapper { 
+        position: absolute !important;
+        top: 0 !important; 
+        right: 10px !important;
+        transform: scale(0.85) !important; 
+        transform-origin: top right !important;
+        margin: 0 !important;
+        padding-top: 4px !important;
+        z-index: 100 !important;
+    }
+
+    .countdown-timer {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-family: monospace !important;
+        font-size: 13px !important;
+        color: #ec4899 !important;
+    }
+}
+
+/* =======================================================
+   MOBILE HORIZONTAL (LANDSCAPE) REFINEMENTS
+   ======================================================= */
+/* 1. SMOOTH ROTATION TRANSITIONS */
+.top-right-container, 
+.top-right-container *,
+.vi-logo,
+.countdown-timer {
+    transition: all 0.3s ease-in-out !important;
+}
+
+/* =======================================================
+   2. LOGO OVER THE CORNER & FULL "DA" VISIBLE
+   ======================================================= */
+.vi-logo {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    padding-left: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =======================================================
+   3. COUNTDOWN TIMER (KEEP & ALIGN)
+   ======================================================= */
+.countdown-timer {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-family: monospace !important;
+    font-size: 13px !important;
+    color: #ec4899 !important; /* Keep your ticking countdown color, previous was #00ffff */
+}
+
+@media screen and (max-width: 932px) and (orientation: landscape) {
+    /* Hide the VI Logo and Countdown completely to save space */
+    .vi-logo, 
+    .countdown-timer { 
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        visibility: hidden !important;
+        display: none !important;
+    }
+
+    /* Morph the top-right area into a compact glass bubble */
+    .top-right-container {
+        position: absolute !important;
+        top: 10px !important;  /* Keep it tucked near the top edge */
+        right: 15px !important; /* Keep it tucked near the right edge */
+        left: auto !important;
+        transform: none !important;
+        
+        /* The Glass Bubble Look */
+        background: rgba(20, 20, 20, 0.65) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 20px !important; /* Full rounded bubble shape */
+        
+        /* Tight layout for the 3 buttons */
+        padding: 6px 14px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 16px !important; /* Space between Sign Up, Sign In, Donate */
+        width: max-content !important;
+        z-index: 99 !important;
+    }
+
+    /* Style the 3 text buttons to be clean and minimal */
+    .top-right-container button,
+    .top-right-container a {
+        font-size: 11px !important; /* Small enough to save space, big enough to tap */
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        background: transparent !important;
+        color: white !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        cursor: pointer !important;
+    }
+
+    /* Give the Donate button a distinct color so it doesn't blend in */
+    .top-right-container .donate-btn {
+        color: #ff69b4 !important; /* Matches your pink aesthetic */
+    }
+    
+    .left-sidebar { 
+        width: 55px !important; 
+        padding: 5px !important;
+    }
+
+    /* Hide emojis just in case */
+    .sparkle-icon, .key-icon, .coffee-icon { 
+        display: none !important; 
+    }
+
+    /* Ensure text links remain visible and properly spaced */
+    .auth-links { 
+        display: flex !important;
+        gap: 15px !important;
+        font-size: 13px !important;
+    }
+
+    /* Keep Contact button aligned */
+    .contact-button-wrapper {
+        top: 60px !important; /* Adjusted slightly so it doesn't overlap the morphed top header */
+        transform: scale(0.9) !important;
+    }
+}
+
+/* Hide on mobile horizontal */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hide-on-mobile-h {
+    display: none !important;
+  }
+}
+
+/* Show scrollbar hint on tablet */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+  .show-scroll-hint {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+  }
+}
+
+/* ============================================
+   TEXT TRUNCATION & OVERFLOW
+   ============================================ */
+
+.truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncate-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================
+   MOBILE-SPECIFIC FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Prevent double-tap zoom delays */
+  input, button, a {
+    touch-action: manipulation;
+  }
+  
+  /* Better mobile input */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
+  }
+}
+
+/* ============================================
+   LANDSCAPE ORIENTATION FIXES
+   ============================================ */
+
+@media (orientation: landscape) {
+  body {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  #root {
+    height: 100vh;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .top-header-bubble,
+  .left-sidebar,
+  .right-side-buttons,
+  .bottom-toolbar {
+    display: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   FORCE ALL BUBBLES TO MATCH - Overrides
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.top-header-bubble,
+.contact-button-wrapper,
+.top-left-bubble,
+.left-sidebar {
+  background: rgba(200, 200, 200, 0.09) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Reposition CONTACT button to pink spot */
+.contact-button-wrapper {
+  position: fixed !important;
+  top: 180px !important;
+  right: 16px !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+.top-header-bubble {
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 10px 24px !important;
+  gap: 20px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.15) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: max-content !important;
+  min-width: max-content !important; /* Forces background to respect full text width */
+  white-space: nowrap !important;
+  transition: all 0.25s ease-in-out !important;
+}
+
+/* Fix the clock container clipping on the right (Tablet Horizontal) */
+.countdown-timer, 
+.countdown-timer-container {
+    display: flex !important;
+    align-items: center !important;
+    padding-right: 18px !important; /* Ensures double digits like '34' stay covered */
+    min-width: max-content !important;
+}
+
+@media (max-width: 1300px) and (orientation: landscape) {
+  .top-header-bubble {
+    transform: translateX(-50%) scale(0.9) !important;
+    transform-origin: top center !important;
+    padding-right: 20px !important;
+    min-width: max-content !important;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  .contact-button-wrapper {
+    top: 160px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .top-header-bubble {
+    transform: translateX(-50%) scale(0.85) !important;
+    transform-origin: top center !important;
+  }
+}
+
+@media (max-width: 950px) and (orientation: landscape) {
+  .top-header-bubble {
+    display: flex !important;
+    transform: translateX(-50%) scale(0.7) !important;
+    transform-origin: top center !important;
+    width: max-content !important;
+    padding: 6px 12px !important;
+    top: 5px !important;
+    white-space: nowrap !important;
+    left: 50% !important;
+  }
+  .countdown-timer {
+    display: flex !important;
+    font-size: 12px !important;
+  }
+  .vi-logo, 
+  .top-header-bubble h1 {
+      display: block !important;
+      font-size: 11px !important;
+  }
+  
+  .button-text {
+      display: inline-block !important; /* Erases landscape hidden bug */
+      font-size: 10px !important;
+  }
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .contact-button-wrapper {
+    display: none !important;
+  }
+  .top-header-bubble {
+    gap: 8px !important;
+    padding: 6px 12px !important;
+    width: max-content !important;
+    transform: translateX(-50%) scale(0.75) !important;
+    transform-origin: top center !important;
+  }
+  .countdown-timer {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+    .top-header-bubble {
+        transform: translateX(-50%) scale(0.75) !important; /* Drops width footprint cleanly */
+        transform-origin: top center !important;
+        gap: 8px !important;
+        padding: 4px 10px !important;
+    }
+}
+
+/* =======================================================
+   UNIVERSAL MODAL FIX (Prevents clipping in Landscape)
+   ======================================================= */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .modal-container, 
+    .hype-metrics-modal,
+    .character-card {
+        max-height: 85dvh !important; /* Forces it to fit within the screen height */
+        overflow-y: auto !important;  /* Enables internal scrolling */
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        margin: 0 !important;
+        
+        /* Hide the ugly scrollbar but keep the scroll function */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .modal-container::-webkit-scrollbar,
+    .hype-metrics-modal::-webkit-scrollbar,
+    .character-card::-webkit-scrollbar {
+        display: none;
+    }
+}   
+
+/* =======================================================
+   RIGHT-SIDE ACTION DOCK (Contact, Settings, Support)
+   ======================================================= */
+.right-action-dock {
+    position: absolute !important;
+    right: 15px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important; /* Perfect spacing between the 3 buttons */
+    z-index: 90 !important;
+}
+
+/* Ensure the buttons inside are uniformly sized */
+.right-action-dock button {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important; /* Perfect circles */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: rgba(20, 20, 20, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .contact-button-wrapper {
+    top: 160px !important;
+    right: 12px !important;
+  }
+}
+
+/* =======================================================
+   PRO HORIZONTAL: SHRINK & MOVE GUESSER MODE TO BOTTOM
+   ======================================================= */
+@media screen and (orientation: landscape) {
+    .minigame-container { /* <-- Change this to your exact Guesser wrapper class */
+        position: absolute !important;
+        
+        /* 1. Wipe out any existing top/middle positioning */
+        top: auto !important; 
+        
+        /* 2. Lock it securely to the bottom of the screen */
+        bottom: 15px !important; 
+        
+        /* 3. Center it horizontally */
+        left: 50% !important; 
+        
+        /* 4. Shrink it 'a lot' (65% of its normal size) and keep it centered */
+        transform: translateX(-50%) scale(0.65) !important; 
+        
+        /* 5. Force the shrinking effect to anchor to the bottom so it doesn't float up */
+        transform-origin: bottom center !important; 
+        
+        z-index: 50 !important;
+    }
+}
+
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    /* Target your purple "PLAY GUESSER MODE" button */
+    .minigame-container {
+        transform: scale(0.65) !important;       /* Reduces size by 35% */
+        transform-origin: bottom left !important; /* Ensures it shrinks toward its corner anchor */
+        left: 15px !important;                    /* Slid closer to the left side menu */
+        bottom: 10px !important;                  /* Clean spacing from the bottom edge */
+    }
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    /* Target the container holding your Donate, Sign Up, and Sign In buttons */
+    .auth-links {
+        display: flex !important;          /* Forces it out of hiding */
+        position: absolute !important;
+        top: 70px !important;              /* Places it cleanly below your top-left corner logo */
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) scale(0.85) !important; /* Centers it perfectly and shrinks it slightly for small screens */
+        width: max-content !important;
+        margin: 0 auto !important;
+        z-index: 9999 !important;          /* Keeps it above the map layer */
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 1024px) and (orientation: portrait) {
+    /* FIX A: Center the "LEONIDA MAP VI" Top Header Bubble */
+    .top-header-bubble {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important; /* Centers the pill flawlessly across the tablet top border */
+        top: 15px !important;
+        width: max-content !important;
+    }
+
+    /* FIX B: Bring back the hidden right side buttons (Mail, Gear, Heart) */
+    .right-action-dock {
+        right: 24px !important;  /* Pulls them away from the screen edge back into full view */
+        left: auto !important;
+    }
+
+    /* Safety rule: prevents parent containers from clipping your viewport assets */
+    .main-app-wrapper {
+        width: 100vw !important;
+        overflow: visible !important;
+    }
+}
+
+/* =======================================================
+   LOGO STYLING
+   ======================================================= */
+/* Apply to your logo wrapper class */
+.logo-container {
+    width: 100%;       /* Match the bubble width */
+    height: 100%;      /* Match the bubble height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-container img {
+    max-width: 80%;    /* Keeps it from touching the bubble edges */
+    max-height: 80%;
+    object-fit: contain; /* This prevents the logo from warping */
+}
+
+/* =======================================================
+   NAV PILL POSITIONING
+   ======================================================= */
+/* 1. General Pill Styling (Global) */
+.nav-pill {
+    width: fit-content;      /* Makes it shrink to fit the buttons inside */
+    max-width: 90%;          /* Prevents overflow on very small screens */
+    margin: 0 auto;          /* Centers it horizontally */
+    padding: 8px 16px;       /* Tightens the padding */
+    position: absolute;      /* Essential for the bottom-left move later */
+    top: 10px;               /* Default top position */
+    z-index: 100;
+}
+
+/* 2. Mobile Landscape Overrides */
+@media screen and (orientation: landscape) and (max-width: 900px) {
+    .nav-pill {
+        top: auto !important;    /* Kill the top positioning */
+        bottom: 15px !important; /* Move to bottom */
+        left: 15px !important;   /* Move to left-ish */
+        right: auto !important;
+        margin: 0 !important;    /* Remove centering */
+        transform: none !important; /* Reset any centering transforms */
+        
+        /* Optional: make it slightly smaller on landscape mobile */
+        scale: 0.9; 
+    }
+}
+
+/* =======================================================
+   LOGO FIT CLASSES
+   ======================================================= */
+/* Apply this class to the <img> tag or the wrapper containing the logo */
+.gta-logo-fit {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important; /* This is the magic: it tells the image to shrink until the WHOLE logo is visible */
+    padding: 2px !important;        /* Adds a tiny bit of breathing room from the bubble edges */
+}
+
+/* Ensure the parent container doesn't force a width that clips the content */
+.logo-bubble-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important; /* Ensure the bubble itself isn't clipping child content */
+}
+
+/* =======================================================
+   STAY UPDATED & COMMS MODAL GLOBAL BOUNDS
+   ======================================================= */
+.stay-updated-modal-container {
+    width: 95vw !important;
+    max-width: 460px !important;
+    max-height: 90dvh !important; /* Clamps container bounds below device edge */
+    overflow-y: auto !important;   /* Unlocks clean thumb scrolling instantly */
+    box-sizing: border-box !important;
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Landscape Tuning: Prevents absolute height clip traps */
+@media screen and (orientation: landscape) and (max-width: 900px) {
+    .stay-updated-modal-container {
+        max-height: 82dvh !important; /* Extra padding margin buffer for wide screens */
+    }
+    
+    .stay-updated-modal-container h2 {
+        font-size: 1.5rem !important; /* Keeps typography titles proportional */
+        margin-bottom: 12px !important;
+    }
+}       
+
+/* =======================================================
+   NAV ACTION PILL: SCALE REUCTION & REPOSITION
+   ======================================================= */
+@media screen and (max-width: 900px) {
+    .auth-nav-pill-wrapper {
+        /* Scaled down ~33% cleanly while preserving center coordinates */
+        transform: scale(0.68) !important;
+        transform-origin: top center !important;
+    }
+}
+
+@media screen and (orientation: landscape) and (max-width: 900px) {
+    .auth-nav-pill-wrapper {
+        position: absolute !important;
+        top: 4px !important;            /* Pushed completely up to the absolute top edge */
+        bottom: auto !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) scale(0.68) !important; /* Shrunk and centered safely */
+        margin: 0 !important;
+        z-index: 10000 !important;      /* Floats completely clear of map boundaries */
+    }
+}
+
+/* =======================================================
+   CHARACTERS: FULL PAGE MOBILE BACKPORT
+   ======================================================= */
+@media screen and (max-width: 1366px) {
+    .characters-panel-wrapper {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important; /* Dynamic viewport height safely scales past mobile address bars */
+        background: rgba(15, 12, 22, 0.98) !important; /* High contrast backdrop matching your palette */
+        z-index: 9999 !important;
+        overflow-y: auto !important; /* Ensures the whole page details stay scrollable */
+        padding: 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Target frame details block inside layout grid */
+    .character-card-container {
+        width: 100% !important;
+        max-width: 600px !important;
+        margin: 0 auto !important;
+    }
+}
+
+/* =======================================================
+   TOP NAV / AUTH BAR (MOBILE & TABLET)
+   ======================================================= */
+@media screen and (max-width: 1024px) {
+    .your-top-header-container {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;   /* Forces everything onto one line */
+        justify-content: center !important;
+        align-items: center !important;
+        position: fixed !important;     /* Locks it to the screen, not the map */
+        top: 5px !important;
+        left: 50% !important;
+        transform: translateX(-50%) scale(0.75) !important; /* Centers and shrinks the whole row by 25% */
+        transform-origin: top center !important;
+        width: max-content !important;
+        z-index: 10000 !important;      /* Keeps it above everything */
+        gap: 10px !important;
+        background: rgba(0, 0, 0, 0.4) !important; /* Optional: adds a slight dark pill background so text doesn't blend into the map */
+        padding: 5px 15px !important;
+        border-radius: 30px !important;
+    }
+}     
+
+/* =======================================================
+   CHARACTER FULL-SCREEN MODAL FIX
+   ======================================================= */
+.character-fullscreen-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important; /* Uses dynamic height to avoid mobile browser bars */
+    background: #0f0c16 !important;
+    z-index: 100000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important; /* Allows scrolling if text is long */
+}
+
+/* Fix the Image Cropping */
+.character-fullscreen-modal img {
+    width: 100% !important;
+    max-height: 50vh !important; /* Never takes up more than half the screen */
+    object-fit: contain !important; /* CRITICAL: Forces full image to show without cropping */
+    background: #000 !important; /* Fills empty space if image is narrow */
+}
+
+/* Ensure Text Stays Below Image */
+.character-fullscreen-text-container {
+    padding: 20px !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
+/* Fix Hidden X and Back Buttons */
+.character-modal-close-btn,
+.character-modal-back-btn {
+    position: fixed !important;
+    top: 15px !important;
+    z-index: 100001 !important;
+    background: rgba(0, 0, 0, 0.7) !important; /* Dark background so it shows over light images */
+    color: white !important;
+    padding: 10px 15px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+/* Put Back on Left, X on Right */
+.character-modal-back-btn { left: 15px !important; }
+.character-modal-close-btn { right: 15px !important; }
+
+/* =======================================================
+   PLAY GUESSER MODE BUTTON
+   ======================================================= */
+@media screen and (max-width: 1024px) {
+    .play-guesser-btn {
+        position: fixed !important;
+        bottom: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) scale(0.8) !important; /* Centers perfectly and shrinks it */
+        transform-origin: bottom center !important;
+        z-index: 9999 !important;
+        width: max-content !important;
+        white-space: nowrap !important; /* Prevents the text from stacking or cutting off */
+    }
+}
+
+/* Nudge it up specifically for Tablet Vertical */
+@media screen and (min-width: 481px) and (max-width: 1024px) and (orientation: portrait) {
+    .play-guesser-btn {
+        bottom: 40px !important; /* Moves it slightly higher */
+        transform: translateX(-50%) scale(0.65) !important; /* Makes it "way smaller" per your request */
+    }
+}
+
+/* =======================================================
+   KO-FI MODAL FIXES
+   ======================================================= */
+/* Make the Close 'X' High Contrast */
+.kofi-modal-close-btn {
+    position: absolute !important;
+    top: -15px !important;
+    right: -15px !important;
+    background: #111 !important; /* Solid dark color */
+    color: #fff !important;      /* White X */
+    border: 2px solid #fff !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 100000 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+}
+
+/* Loading Spinner Wrapper (Put your iframe inside this container) */
+.kofi-iframe-container {
+    position: relative !important;
+    width: 100%;
+    min-height: 400px;
+    background: #f4f4f4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="%23bc00ff" stroke-width="4" stroke-dasharray="31.4 31.4"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/></circle></svg>') no-repeat center center;
+    background-size: 50px 50px;
+}
+
+/* Ensure the iframe covers the spinner once it finally loads */
+.kofi-iframe-container iframe {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+}  
+
+.your-left-sidebar-container {
+    overflow-y: auto !important; /* Allows scrolling */
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
+.your-left-sidebar-container::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari and Opera */
+}    
+
+/* Hides the default leaflet watermark to clean up your UI */
+.leaflet-control-attribution {
+    display: none !important;
+}  
+
+/* When drawing is active, apply this class to the map container */
+.map-drawing-active {
+    cursor: crosshair !important; /* Turns the mouse into a targeting plus-sign */
+}  
+
+/* Apply this to the container holding the individual character details */
+.character-detail-view {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;     /* Locks it to the modal height */
+    max-height: 85dvh !important; /* Prevents it from going off-screen */
+    overflow: hidden !important; /* Stops the whole page from scrolling */
+}
+
+/* Force the image to stop growing */
+.character-detail-image-wrapper {
+    flex-shrink: 0 !important;
+    height: 40% !important;      /* Never takes up more than 40% of the modal */
+    width: 100% !important;
+}
+
+.character-detail-image-wrapper img {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: contain !important; /* Fills the 40% box nicely, without cutting off */
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Force the text to scroll INDEPENDENTLY of the image */
+.character-detail-text-content {
+    flex-grow: 1 !important;
+    overflow-y: auto !important; /* The text scrolls, the image stays pinned */
+    padding: 20px !important;
+}    
+
+/* Add this to your global CSS */
+.leaflet-control-container {
+    z-index: 400 !important; /* Keeps map controls relatively low */
+}
+
+/* Ensure ALL your custom overlays, sidebars, and modals sit above 1000 */
+.your-left-sidebar,
+.right-floating-buttons {
+    z-index: 1000 !important;
+}
+
+.modal-backdrop-blur {
+    z-index: 9999 !important; /* The background blur */
+}
+
+.actual-modal-window {
+    z-index: 10000 !important; /* The modal itself */
+}  
+
+/* Add breathing room to the bottom of the modal so the keyboard/dropdowns don't hide the submit button */
+.stay-updated-modal-container {
+    padding-bottom: 60px !important; 
+}  
+
+/* =======================================================
+   NATIVE TOUCH LOCKDOWN ENGINE
+   ======================================================= */
+
+/* 1. Stop Pull-to-Refresh & Rubber-Banding on Mobile/Laptops */
+html, body {
+    overscroll-behavior-y: none !important;
+    overscroll-behavior-x: none !important;
+    touch-action: none !important; /* Prevents default browser panning/zooming on the body */
+}
+
+/* 2. Stop Accidental Text Highlighting when fast-tapping */
+* {
+    -webkit-user-select: none !important; /* Safari */
+    -ms-user-select: none !important;     /* IE 10 and IE 11 */
+    user-select: none !important;         /* Standard */
+    
+    /* Disables the blue tap-highlight box on Android/iOS */
+    -webkit-tap-highlight-color: transparent !important; 
+}
+
+/* 3. Re-enable text selection ONLY where needed (like inputs) */
+input, textarea {
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
+    touch-action: manipulation !important; /* Allows normal typing behavior */
+}
+
+/* 4. Optimize your UI Buttons for rapid tapping */
+button, .your-interactive-icons {
+    /* Prevents the dreaded 'double tap to zoom' on interactive elements */
+    touch-action: manipulation !important; 
+    
+    /* Hardware acceleration for smoother active states */
+    transform: translateZ(0); 
+}   
+
+/* =======================================================
+   TACTILE BUTTON MICRO-ANIMATIONS
+   ======================================================= */
+   
+/* The baseline transition state */
+.haptic-btn {
+    transition: transform 0.05s cubic-bezier(0.4, 0, 0.2, 1), 
+                background-color 0.1s ease !important;
+}
+
+/* The exact moment the user's finger touches the glass */
+.haptic-btn:active {
+    transform: scale(0.92) !important; /* Snaps inward instantly */
+    filter: brightness(0.8) !important; /* Dims slightly like a physical button shadow */
+}
+
+/* Specialized for your Left Navigation Tools */
+.tool-icon-btn:active {
+    transform: scale(0.85) !important; /* A deeper press for map tools */
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   LEONIDA MAP VI - FINAL MOBILE FIXES
+   Portrait: Single-line header with DONATE, SIGN UP, SIGN IN
+   Landscape: Full-page character view, tiny play button, image top fixed
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   MOBILE PORTRAIT (< 480px, Portrait) - Hide LEONIDA, Single-line buttons
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  
+  /* Hide LEONIDA MAP VI logo completely */
+  .gta-3d-title,
+  .leonida-logo,
+  h1[class*="gta"] {
+    display: none !important;
+  }
+  
+  /* Header bubble - force single line */
+  .top-header-bubble {
+    padding: 8px 12px !important;
+    gap: 4px !important;
+    width: 95% !important;
+    white-space: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+  
+  /* Container for buttons - flex, single line */
+  .top-header-bubble {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  /* Hide dividers */
+  .header-divider,
+  .top-header-bubble > div[style*="w-[1px]"],
+  .top-header-bubble > div[style*="bg-white/20"] {
+    display: none !important;
+  }
+  
+  /* Buttons stay visible and shrink */
+  .gta-3d-nav {
+    font-size: 8px !important;
+    padding: 4px !important;
+    text-shadow: 
+      0.5px 0.5px 0px #000,
+      1px 1px 0px #a855f7,
+      1px 1px 0px #000 !important;
+  }
+  
+  /* Button icons only */
+  .button-text {
+    display: none !important;
+  }
+  
+  /* Shrink countdown */
+  .launch-countdown {
+    font-size: 7px !important;
+    padding: 2px 4px !important;
+  }
+  
+  /* DONATE button stays visible */
+  button[onclick*="setIsDonateOpen"] {
+    flex-shrink: 0;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   MOBILE LANDSCAPE (< 500px height, Landscape) - Full-page modals, tiny play button
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  /* CHARACTER MODAL - Full page, full screen */
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  
+  .character-card,
+  .ui-panel[class*="character"],
+  .character-modal-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 99999 !important;
+    overflow: hidden !important;
+  }
+  
+  /* Character header with back + close buttons */
+  .ui-panel-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 40px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    z-index: 10001 !important;
+  }
+  
+  .ui-panel-header h2 {
+    display: none !important;
+  }
+  
+  /* Show back + close buttons */
+  .modal-back-btn {
+    display: flex !important;
+    width: 32px !important;
+    height: 32px !important;
+    gap: 0 !important;
+  }
+  
+  .close-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  /* Character content wrapper */
+  .ui-panel-content {
+    position: absolute !important;
+    top: 40px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: calc(100vh - 40px) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Character image - FULL SIZE, TOP ALIGNED */
+  .character-image,
+  .character-image-element,
+  img[class*="character"] {
+    width: 100% !important;
+    height: 60vh !important;
+    object-fit: contain !important;
+    object-position: top center !important; /* CRITICAL: Keeps top visible */
+    display: block !important;
+  }
+  
+  /* Character info - scrollable below image */
+  .character-info,
+  .character-details,
+  .character-detail-view-wrapper {
+    width: 100% !important;
+    height: calc(40vh - 40px) !important;
+    padding: 12px !important;
+    overflow-y: auto !important;
+    background: rgba(20, 20, 30, 0.95) !important;
+  }
+  
+  .character-name {
+    font-size: 20px !important;
+    margin: 8px 0 !important;
+  }
+  
+  .character-description {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Character info scrollbar */
+  .character-info::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .character-info::-webkit-scrollbar-thumb {
+    background: rgba(255, 105, 180, 0.3);
+  }
+  
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  /* PLAY GUESSER BUTTON - Ultra-tiny */
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  
+  .play-guesser-btn,
+  .play-guesser-btn-container,
+  .mini-game-widget,
+  button[class*="play"][class*="guesser"],
+  .bottom-toolbar {
+    padding: 2px 6px !important;
+    max-height: 28px !important;
+    min-height: 28px !important;
+  }
+  
+  .play-guesser-btn-text {
+    font-size: 9px !important;
+    letter-spacing: 0.3px !important;
+    white-space: nowrap !important;
+  }
+  
+  .mini-game-widget {
+    position: fixed !important;
+    bottom: 50px !important;
+    right: 8px !important;
+    max-width: 80px !important;
+    z-index: 30 !important;
+  }
+  
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  /* OTHER MODALS - Full screen */
+  /* ─────────────────────────────────────────────────────────────────────────────────── */
+  
+  .ui-panel:not(.character-card),
+  .settings-modal-card,
+  .stay-updated-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   BASE RESPONSIVE DEFAULTS - Always apply
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Show back button on mobile landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-back-btn {
+    display: flex !important;
+  }
+}
+
+/* Hide back button on desktop/tablet */
+@media (min-height: 600px),
+       (orientation: portrait) {
+  .modal-back-btn {
+    display: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES - Smooth transitions
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent double-tap zoom on mobile */
+@media (max-width: 768px) {
+  input, button, a {
+    touch-action: manipulation;
+  }
+}
+
+/* Prevent landscape zooming */
+@media (orientation: landscape) {
+  body {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  #root {
+    height: 100vh;
+    max-height: 100vh;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   BUTTON SIZING - Responsive
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile portrait - smaller buttons */
+@media (max-width: 480px) and (orientation: portrait) {
+  .ui-button {
+    padding: 4px 8px !important;
+    font-size: 9px !important;
+  }
+}
+
+/* Mobile landscape - minimal buttons */
+@media (max-height: 500px) and (orientation: landscape) {
+  .ui-button {
+    padding: 3px 6px !important;
+    font-size: 8px !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   CONTACT BUTTON - Responsive
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  .contact-button-wrapper {
+    display: none !important;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .contact-button-wrapper {
+    top: 40px !important;
+    right: 4px !important;
+    padding: 4px 8px !important;
+  }
+  
+  .contact-button-wrapper span {
+    font-size: 7px !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   RIGHT SIDE BUTTONS - Responsive
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .right-side-buttons {
+    right: 2px !important;
+    gap: 4px !important;
+  }
+  
+  .right-side-buttons button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 4px !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   TEXT OVERFLOW - Prevent wrapping
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.top-header-bubble,
+.button-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   MODAL ADJUSTMENTS
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+.ui-panel-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ui-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ui-panel-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 105, 180, 0.2);
+  border-radius: 2px;
+}
+
+.ui-panel-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 105, 180, 0.4);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   ANIMATIONS - Smooth transitions
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes slideIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ui-panel {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════════════════
+   FINAL FIXES - Make sure these are the last rules
+   ════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Force mobile portrait header to be single line */
+@media (max-width: 480px) and (orientation: portrait) {
+  .top-header-bubble * {
+    flex-shrink: 0;
+  }
+}
+
+/* Force mobile landscape to use full viewport */
+@media (max-height: 500px) and (orientation: landscape) {
+  * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Mobile Vertical Header Container */
+.mobile-header-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    padding: 10px 5px !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important; /* Stacked approach for visibility */
+    gap: 5px !important;
+}
+
+/* Row 1: Logo, Back, Countdown */
+.mobile-header-row-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* Row 2: Auth Buttons (Support, Sign Up, Sign In) */
+.mobile-auth-bar {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+/* OPTION: If you absolutely MUST have 1 line, use this instead */
+@media (max-width: 480px) {
+    .force-one-line {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 10px !important; /* Forces text tiny to fit */
+        white-space: nowrap !important;
+    }
+}
+
+/* Button & Logo Sizing */
+.vi-logo { height: 30px !important; width: auto !important; }
+.auth-btn { 
+    padding: 4px 8px !important; 
+    font-size: 10px !important; 
+    border-radius: 15px !important; 
+}   /* If using icons in your buttons */
+.auth-btn-icon {
+    width: 24px !important;
+    height: 24px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =======================================================
+   FINAL FIXES REQUESTED BY USER
+   ======================================================= */
+
+/* 1. Mobile Landscape Map Fix */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    #map, .map-container, .leaflet-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        left: 0 !important;
+        top: 0 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .leaflet-image-layer, .leaflet-image-layer img {
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        object-fit: cover !important;
+    }
+}
+
+/* 2. Timeline Portrait Overlap Fix */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+    .space-y-12 > div.flex {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+    .space-y-12 > div.flex > div.w-14.h-14 {
+        margin-bottom: 24px !important;
+    }
+    .absolute.left-\[51px\] {
+        left: 47px !important;
+    }
+}
