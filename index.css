@@ -2360,26 +2360,6 @@ html {
    FINAL FIXES REQUESTED BY USER
    ======================================================= */
 
-/* 1. Mobile Landscape Map Fix */
-@media screen and (max-width: 900px) and (orientation: landscape) {
-    #map, .map-container, .leaflet-container {
-        width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        left: 0 !important;
-        top: 0 !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    .leaflet-image-layer, .leaflet-image-layer img {
-        width: 100vw !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        object-fit: cover !important;
-    }
-}
-
 /* 2. Timeline Portrait Overlap Fix */
 @media screen and (max-width: 768px) and (orientation: portrait) {
     .space-y-12 > div.flex {
@@ -2392,4 +2372,80 @@ html {
     .absolute.left-\[51px\] {
         left: 47px !important;
     }
+}
+
+/* ============================================
+   MOBILE LANDSCAPE — COMPACT OPTIMIZED LAYOUT
+   Narrows the sidebar, hides labels, anchors
+   modals as bottom sheets beside the toolbar.
+   ============================================ */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Narrow sidebar variable — all rules using var(--toolbar-width-mobile)
+     (map-container left/width, etc.) pick this up automatically. */
+  :root {
+    --toolbar-width-mobile: 56px;
+  }
+
+  /* Remove horizontal padding so 56 px buttons fill the 56 px sidebar flush */
+  .left-sidebar,
+  .your-left-sidebar-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 52px !important;
+    gap: 2px !important;
+  }
+
+  /* Shrink the logo to fit the narrower bar */
+  .your-left-sidebar-container > div:first-child,
+  .left-sidebar > div:first-child {
+    width: 44px !important;
+    height: 44px !important;
+    margin-top: 0 !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Icons-only: hide all text labels */
+  .left-sidebar button span,
+  .your-left-sidebar-container button span {
+    display: none !important;
+  }
+
+  /* Tighter icon buttons without label gap */
+  .left-sidebar .tool-btn,
+  .your-left-sidebar-container .tool-btn {
+    gap: 0 !important;
+    padding: 6px !important;
+    width: 44px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Dividers fit the narrower bar */
+  .left-sidebar .w-8,
+  .your-left-sidebar-container .w-8 {
+    width: 36px !important;
+  }
+
+  /* Modals anchored as bottom sheets to the right of the sidebar */
+  .ui-panel,
+  .settings-modal-card,
+  .stay-updated-modal,
+  .stay-updated-modal-container,
+  .newsletter-modal,
+  .news-modal,
+  .auth-modal,
+  .donate-modal,
+  .coming-soon-modal {
+    position: fixed !important;
+    bottom: 16px !important;
+    top: auto !important;
+    left: calc(var(--toolbar-width-mobile) + 12px) !important;
+    right: 12px !important;
+    transform: none !important;
+    max-height: 68dvh !important;
+    width: auto !important;
+    max-width: none !important;
+    overflow-y: auto !important;
+    border-radius: 12px !important;
+  }
 }
