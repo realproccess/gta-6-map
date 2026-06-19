@@ -123,11 +123,12 @@ function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
       map.fitBounds(bounds);
       return;
     }
-    // Cover mode: pick zoom level that fills the viewport in both directions
-    // so there are no black bars around the map image
     const zoomW = Math.log2(vw / imageW);
     const zoomH = Math.log2(vh / imageH);
-    map.setView([imageH / 2, imageW / 2], Math.max(zoomW, zoomH), { animate: false });
+    // Portrait mobile: contain (show full island). Landscape/desktop: cover (fill viewport).
+    const isPortraitMobile = vw <= 768 && vh > vw;
+    const zoom = isPortraitMobile ? Math.min(zoomW, zoomH) : Math.max(zoomW, zoomH);
+    map.setView([imageH / 2, imageW / 2], zoom, { animate: false });
   }, [map]);
   return null;
 }
