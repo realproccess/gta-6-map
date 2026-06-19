@@ -594,14 +594,14 @@ html, body, #root {
   }
 }
 
-/* Landscape mobile: explicitly fill the remaining space next to sidebar */
+/* Landscape mobile: sit below the compact header so zoom calc uses the real visible height */
 @media (max-width: 768px) and (orientation: landscape) {
   .map-container {
     position: absolute !important;
-    top: 0 !important;
+    top: var(--header-height-mobile-h) !important;
     left: var(--toolbar-width-mobile) !important;
     width: calc(100% - var(--toolbar-width-mobile)) !important;
-    height: 100dvh !important;
+    height: calc(100dvh - var(--header-height-mobile-h)) !important;
   }
 }
 

@@ -111,23 +111,41 @@ function TouchDrawHandler({
   return null;
 }
 
+function fitMapToContainer(map: L.Map, bounds: L.LatLngBoundsExpression) {
+  const b = L.latLngBounds(bounds as any);
+  const imageW = b.getEast() - b.getWest();
+  const imageH = b.getNorth() - b.getSouth();
+  const vw = map.getContainer().clientWidth;
+  const vh = map.getContainer().clientHeight;
+  if (!vw || !vh) {
+    map.fitBounds(bounds);
+    return;
+  }
+  const zoomW = Math.log2(vw / imageW);
+  const zoomH = Math.log2(vh / imageH);
+  map.setView([imageH / 2, imageW / 2], Math.min(zoomW, zoomH), { animate: false });
+}
+
 function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
-    const b = L.latLngBounds(bounds as any);
-    const imageW = b.getEast() - b.getWest();
-    const imageH = b.getNorth() - b.getSouth();
-    const vw = map.getContainer().clientWidth;
-    const vh = map.getContainer().clientHeight;
-    if (!vw || !vh) {
-      map.fitBounds(bounds);
-      return;
-    }
-    const zoomW = Math.log2(vw / imageW);
-    const zoomH = Math.log2(vh / imageH);
-    const zoom = Math.min(zoomW, zoomH);
-    map.setView([imageH / 2, imageW / 2], zoom, { animate: false });
+    fitMapToContainer(map, bounds);
   }, [map]);
+  return null;
+}
+
+function OrientationHandler({ bounds }: { bounds: L.LatLngBoundsExpression }) {
+  const map = useMap();
+  useEffect(() => {
+    const onOrientationChange = () => {
+      setTimeout(() => {
+        map.invalidateSize();
+        fitMapToContainer(map, bounds);
+      }, 300);
+    };
+    window.addEventListener('orientationchange', onOrientationChange);
+    return () => window.removeEventListener('orientationchange', onOrientationChange);
+  }, [map, bounds]);
   return null;
 }
 
@@ -359,6 +377,7 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
         style={{ background: 'transparent' }}
       >
         <MapFitter bounds={imageBounds} />
+        <OrientationHandler bounds={imageBounds} />
         <TouchDrawHandler
           activeTool={activeTool || ''}
           activeColor={activeColor}
