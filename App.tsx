@@ -197,7 +197,7 @@ export default function App() {
           onWheel={(e) => e.stopPropagation()}
         >
           {/* Navigation */}
-          <nav className="flex gap-2 sm:gap-4 md:gap-8 lg:gap-16 landscape:gap-4">
+          <nav className="min-w-0 flex gap-2 sm:gap-4 md:gap-8 lg:gap-16 landscape:gap-4">
             <button
               onClick={() => { import('./haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
               className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-yellow-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
@@ -224,8 +224,8 @@ export default function App() {
             )}
           </nav>
 
-          {/* Countdown */}
-          <div className="border-l-2 md:border-l-4 border-white/50 pl-2 sm:pl-4 md:pl-8 flex items-center landscape:pl-4">
+          {/* Countdown — shrink-0 ensures it's never squeezed out of the flex row */}
+          <div className="shrink-0 border-l-2 md:border-l-4 border-white/50 pl-2 sm:pl-4 md:pl-8 flex items-center landscape:pl-4">
             <LaunchCountdown />
           </div>
 
@@ -248,15 +248,15 @@ export default function App() {
 
       {/* Sign Out Button - Only show if logged in */}
       {sessionUser && (
-        <button 
+        <button
           onClick={async () => {
              await supabase.auth.signOut();
              setSessionUser(null);
           }}
-          className="absolute right-3 sm:right-6 top-3 sm:top-6 z-50 flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 sm:px-4 py-2 text-white font-semibold tracking-wide text-xs sm:text-sm hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="absolute right-3 top-3 z-50 flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 text-white font-semibold tracking-wide text-xs hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
           title="Sign Out"
         >
-          <LogOut size={14} className="sm:w-4 sm:h-4" />
+          <LogOut size={13} />
           <span className="hidden sm:inline">Sign Out</span>
         </button>
       )}
