@@ -187,38 +187,37 @@ export default function App() {
         />
       </div>
 
-      {/* TOP HEADER PILL / NAV */}
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-center py-4 px-8 pointer-events-none landscape:py-1">
-        {/* The Hero Hub Container - Significantly larger footprint */}
-        <div 
-          className="flex items-center gap-2 sm:gap-4 md:gap-8 lg:gap-32 bg-black/10 backdrop-blur-sm rounded-xl px-2 sm:px-6 md:px-8 py-2 sm:py-4 md:py-4 border border-white/10 pointer-events-auto landscape:px-6 landscape:py-2 landscape:gap-6"
-          onClick={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-        >
-          
-          {/* Navigation - Massive text for desktop */}
-          <nav className="flex gap-2 sm:gap-4 md:gap-8 lg:gap-16 landscape:gap-4">
-            <button 
+      {/* TOP HEADER — full-width frosted glass bar */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-black/25 backdrop-blur-md border-b border-white/10 pointer-events-none"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 sm:px-8 md:px-12 py-2 sm:py-3 md:py-4 pointer-events-auto landscape:py-1.5">
+
+          {/* Navigation */}
+          <nav className="flex gap-3 sm:gap-6 md:gap-8 lg:gap-16">
+            <button
               onClick={() => { import('./haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
-              className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-yellow-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
+              className="nav-btn text-xs sm:text-base md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-yellow-400 transition-colors landscape:text-sm"
             >
               TIP
             </button>
-            
+
             {!sessionUser && (
               <>
-                <button 
+                <button
                   onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
-                  className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-cyan-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
+                  className="nav-btn text-xs sm:text-base md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-cyan-400 transition-colors landscape:text-sm"
                 >
                   SIGN UP
                 </button>
-                
-                <button 
+
+                <button
                   onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signin'); setIsAuthModalOpen(true); }}
-                  className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-pink-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
+                  className="nav-btn text-xs sm:text-base md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-pink-400 transition-colors landscape:text-sm"
                 >
                   SIGN IN
                 </button>
@@ -226,11 +225,11 @@ export default function App() {
             )}
           </nav>
 
-          {/* Countdown - Massive and bold */}
-          <div className="border-l-2 md:border-l-4 border-white/50 pl-2 sm:pl-4 md:pl-8 flex items-center landscape:pl-4">
+          {/* Countdown */}
+          <div className="flex items-center">
             <LaunchCountdown />
           </div>
-          
+
         </div>
       </header>
 

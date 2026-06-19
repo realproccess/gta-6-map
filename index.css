@@ -72,6 +72,13 @@ body {
   overflow: hidden !important;
   border-radius: 16px;
 }
+
+/* Remove border-radius on mobile so the map fills edge-to-edge */
+@media (max-width: 1024px) {
+  #map, .map-container {
+    border-radius: 0 !important;
+  }
+}
 .leaflet-popup-content-wrapper {
   background: transparent !important;
   color: white;
@@ -532,14 +539,27 @@ html, body, #root {
   }
 }
 
-/* Mobile horizontal - CRITICAL: full height to bottom */
+/* Mobile horizontal - compact sidebar that scrolls, no excessive top padding */
 @media (max-width: 768px) and (orientation: landscape) {
   .left-sidebar {
     height: 100dvh;
     width: var(--toolbar-width-mobile);
-    padding: 56px 4px 6px;
-    gap: 3px;
+    padding: 4px 4px 4px;
+    gap: 2px;
     bottom: 0;
+    overflow-y: auto;
+  }
+  /* Hide text labels in landscape so only icons show — saves vertical space */
+  .left-sidebar span,
+  .your-left-sidebar-container span {
+    display: none !important;
+  }
+  /* Compact logo in landscape sidebar */
+  .left-sidebar .w-16 {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
   }
 }
 
@@ -583,6 +603,31 @@ html, body, #root {
   .map-container {
     left: var(--toolbar-width-tablet);
     width: calc(100% - var(--toolbar-width-tablet));
+  }
+}
+
+/* Landscape mobile: explicitly fill the remaining space next to sidebar */
+@media (max-width: 768px) and (orientation: landscape) {
+  .map-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: var(--toolbar-width-mobile) !important;
+    width: calc(100% - var(--toolbar-width-mobile)) !important;
+    height: 100dvh !important;
+  }
+}
+
+/* ============================================
+   TOP NAV BUTTON
+   ============================================ */
+.nav-btn {
+  text-shadow: 2px 2px 0px rgb(0 0 0);
+}
+
+/* Reduce text-shadow on mobile — 4px offset looks doubled at small font sizes */
+@media (max-width: 767px) {
+  .nav-btn {
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
   }
 }
 
@@ -1308,23 +1353,28 @@ html, body, #root {
    UNIVERSAL MODAL FIX (Prevents clipping in Landscape)
    ======================================================= */
 @media screen and (max-height: 600px) and (orientation: landscape) {
-    .modal-container, 
+    /* Cap ALL modals so they fit on landscape phone screens and scroll internally */
+    .modal-container,
     .hype-metrics-modal,
-    .character-card {
-        max-height: 85dvh !important; /* Forces it to fit within the screen height */
-        overflow-y: auto !important;  /* Enables internal scrolling */
+    .character-card,
+    .ui-panel,
+    .settings-modal-card,
+    .stay-updated-modal-container {
+        max-height: 88dvh !important;
+        overflow-y: auto !important;
         top: 50% !important;
         transform: translate(-50%, -50%) !important;
         margin: 0 !important;
-        
-        /* Hide the ugly scrollbar but keep the scroll function */
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
-    
+
     .modal-container::-webkit-scrollbar,
     .hype-metrics-modal::-webkit-scrollbar,
-    .character-card::-webkit-scrollbar {
+    .character-card::-webkit-scrollbar,
+    .ui-panel::-webkit-scrollbar,
+    .settings-modal-card::-webkit-scrollbar,
+    .stay-updated-modal-container::-webkit-scrollbar {
         display: none;
     }
 }   
@@ -1361,6 +1411,15 @@ html, body, #root {
   .contact-button-wrapper {
     top: 160px !important;
     right: 12px !important;
+  }
+  /* Compact dock buttons so they don't eat map real estate in landscape */
+  .right-action-dock {
+    gap: 8px !important;
+    right: 10px !important;
+  }
+  .right-action-dock button {
+    width: 36px !important;
+    height: 36px !important;
   }
 }
 

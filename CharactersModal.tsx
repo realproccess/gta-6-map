@@ -134,7 +134,7 @@ export function CharactersModal({ isOpen, onClose }: { isOpen: boolean; onClose:
 
       {/* LEFT PANEL */}
       <div 
-        className={`characters-panel-wrapper fixed top-6 left-2 md:left-6 lg:left-[100px] w-[calc(100vw-16px)] md:w-[380px] min-h-[500px] text-white z-[9990] transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] flex flex-col shadow-2xl border border-white/10 bg-[#0f0c16]/95 backdrop-blur-xl rounded-2xl landscape:w-screen landscape:h-[100dvh] landscape:top-0 landscape:left-0 landscape:rounded-none landscape:border-none ${
+        className={`characters-panel-wrapper fixed top-6 left-2 md:left-6 lg:left-[100px] w-[calc(100vw-16px)] md:w-[380px] min-h-[500px] text-white z-[9990] transform transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] flex flex-col shadow-2xl border border-white/10 bg-[#0f0c16]/95 backdrop-blur-xl rounded-2xl landscape:w-screen landscape:h-[100dvh] landscape:min-h-0 landscape:top-0 landscape:left-0 landscape:rounded-none landscape:border-none landscape:bg-[#0f0c16] ${
           isOpen && !zoomedChar ? 'translate-x-0' : '-translate-x-[150vw]'
         }`}
       >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, ImageOverlay, Marker, Popup, Polyline, Circle, useMapEvents, useMap, Tooltip } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L, { LatLngExpression } from 'leaflet';
@@ -38,6 +38,78 @@ const createCustomClusterIcon = (cluster: any) => {
     iconSize: L.point(40, 40, true),
   });
 };
+
+// Fixes touch drawing on mobile: Leaflet stops converting touchmove→mousemove when
+// dragging is disabled, so we attach native touch listeners with capture+passive:false
+// to intercept events before Leaflet and convert them to lat/lng ourselves.
+function TouchDrawHandler({
+  activeTool,
+  activeColor,
+  setCurrentRoute,
+  setRoutes,
+}: {
+  activeTool: string;
+  activeColor: string;
+  setCurrentRoute: React.Dispatch<React.SetStateAction<L.LatLngExpression[]>>;
+  setRoutes: React.Dispatch<React.SetStateAction<{ points: L.LatLngExpression[], color: string, tool?: string }[]>>;
+}) {
+  const map = useMap();
+  const isDrawingRef = useRef(false);
+  const colorRef = useRef(activeColor);
+
+  useEffect(() => { colorRef.current = activeColor; }, [activeColor]);
+
+  useEffect(() => {
+    if (activeTool !== 'draw') {
+      isDrawingRef.current = false;
+      return;
+    }
+    const el = map.getContainer();
+
+    const toLatLng = (touch: Touch) => {
+      const r = el.getBoundingClientRect();
+      return map.containerPointToLatLng(L.point(touch.clientX - r.left, touch.clientY - r.top));
+    };
+
+    const onStart = (e: TouchEvent) => {
+      e.preventDefault();
+      if (e.touches.length !== 1) return;
+      const ll = toLatLng(e.touches[0]);
+      isDrawingRef.current = true;
+      setCurrentRoute([[ll.lat, ll.lng]]);
+    };
+
+    const onMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!isDrawingRef.current || e.touches.length !== 1) return;
+      const ll = toLatLng(e.touches[0]);
+      setCurrentRoute(prev => [...prev, [ll.lat, ll.lng]]);
+    };
+
+    const onEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!isDrawingRef.current) return;
+      isDrawingRef.current = false;
+      const c = colorRef.current;
+      setCurrentRoute(prev => {
+        if (prev.length > 1) setRoutes(r => [...r, { points: prev, color: c, tool: 'draw' }]);
+        return [];
+      });
+    };
+
+    el.addEventListener('touchstart', onStart, { passive: false, capture: true });
+    el.addEventListener('touchmove', onMove, { passive: false, capture: true });
+    el.addEventListener('touchend', onEnd, { passive: false, capture: true });
+
+    return () => {
+      el.removeEventListener('touchstart', onStart, { capture: true });
+      el.removeEventListener('touchmove', onMove, { capture: true });
+      el.removeEventListener('touchend', onEnd, { capture: true });
+    };
+  }, [map, activeTool]);
+
+  return null;
+}
 
 function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
@@ -179,10 +251,17 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
     setCurrentCircleObj(null);
   }, [drawingsRefresher]);
 
-  // When active tool changes, commit any in-progress drawings
+  const [isDrawing, setIsDrawing] = useState(false);
+  const prevToolRef = useRef(activeTool);
+
+  // When active tool changes, commit any in-progress drawings.
+  // prevToolRef tells us which tool was active so we label the route correctly
+  // (previously this was hardcoded to 'measure' which caused draw strokes to show as dashed lines).
   useEffect(() => {
+    const prevTool = prevToolRef.current;
+    prevToolRef.current = activeTool;
     if (activeTool !== 'draw' && activeTool !== 'measure' && currentRoute.length > 0) {
-      setRoutes(prev => [...prev, { points: currentRoute, color: activeColor, tool: 'measure' }]);
+      setRoutes(prev => [...prev, { points: currentRoute, color: activeColor, tool: prevTool === 'draw' ? 'draw' : 'measure' }]);
       setCurrentRoute([]);
     }
     if (activeTool !== 'circle' && currentCircleObj) {
@@ -191,9 +270,9 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
     }
   }, [activeTool]);
 
-  const [isDrawing, setIsDrawing] = useState(false);
-
   const handleMouseDown = (e: L.LeafletMouseEvent) => {
+    // Skip if this is a synthesised mouse event from a touch (TouchDrawHandler handles those)
+    if (e.originalEvent instanceof TouchEvent) return;
     if (activeTool === 'draw') {
       setIsDrawing(true);
       setCurrentRoute([[e.latlng.lat, e.latlng.lng]]);
@@ -201,6 +280,7 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
   };
 
   const handleMouseUp = (e: L.LeafletMouseEvent) => {
+    if (e.originalEvent instanceof TouchEvent) return;
     if (activeTool === 'draw' && isDrawing) {
       setIsDrawing(false);
       setCurrentRoute(prev => {
@@ -280,6 +360,12 @@ export function MapCanvas({ pins, activeFilters, gameState, handleGuess, onCoord
         style={{ background: 'transparent' }}
       >
         <MapFitter bounds={imageBounds} />
+        <TouchDrawHandler
+          activeTool={activeTool || ''}
+          activeColor={activeColor}
+          setCurrentRoute={setCurrentRoute}
+          setRoutes={setRoutes}
+        />
         <CoordinateDisplay onCoordsChange={onCoordsChange} />
         
         <ImageOverlay
