@@ -20,9 +20,10 @@ export function UserBubble({ username, onSignOut }: UserBubbleProps) {
   };
 
   return (
-    // left-[78px] clears the 70px sidebar so we don't overlap the VI toolbar logo
-    <div className="absolute top-3 left-[78px] z-[1000]">
-      <div className="relative">
+    // Positioned below the header (top:70px) and centered so it never covers
+    // the VI logo, TIP text, or countdown timer (header is z-50, this is z-30).
+    <div className="absolute top-[70px] left-1/2 -translate-x-1/2 z-30 max-w-xs w-auto">
+      <div className="relative flex justify-center">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
@@ -30,7 +31,7 @@ export function UserBubble({ username, onSignOut }: UserBubbleProps) {
           <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
             <User size={12} className="text-white" />
           </div>
-          <span className="text-white text-sm font-semibold tracking-wide max-w-[90px] truncate">@{username}</span>
+          <span className="text-white text-sm font-semibold tracking-wide max-w-[120px] truncate">@{username}</span>
         </button>
 
         {isOpen && (

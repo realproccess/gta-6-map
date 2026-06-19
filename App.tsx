@@ -4,7 +4,7 @@
  */
 
 import React, { useState, Suspense, lazy } from 'react';
-import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, LogOut, Mail } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail } from 'lucide-react';
 import { MapCanvas } from './MapCanvas';
 
 import { Pin, GameState } from './types';
@@ -244,22 +244,8 @@ export default function App() {
         onOpenComingSoon={(title) => setComingSoonTitle(title)}
       />
 
+      {/* User bubble — centered below header at z-30, sign-out is in its dropdown */}
       {sessionUser && <UserBubble username={sessionUser} onSignOut={() => setSessionUser(null)} />}
-
-      {/* Sign Out Button - Only show if logged in */}
-      {sessionUser && (
-        <button
-          onClick={async () => {
-             await supabase.auth.signOut();
-             setSessionUser(null);
-          }}
-          className="absolute right-3 top-3 z-50 flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 text-white font-semibold tracking-wide text-xs hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-          title="Sign Out"
-        >
-          <LogOut size={13} />
-          <span className="hidden sm:inline">Sign Out</span>
-        </button>
-      )}
 
       {/* RIGHT SIDE BUTTONS */}
       <div 
