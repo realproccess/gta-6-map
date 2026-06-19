@@ -4,7 +4,7 @@
  */
 
 import React, { useState, Suspense, lazy } from 'react';
-import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail, User, LogOut } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail } from 'lucide-react';
 import { MapCanvas } from './MapCanvas';
 
 import { Pin, GameState } from './types';
@@ -27,6 +27,7 @@ import { MiniGameWidget } from './MiniGameWidget';
 import { ViceDreamBackground } from './ViceDreamBackground';
 
 import { LaunchCountdown } from './LaunchCountdown';
+import { UserBubble } from './UserBubble';
 import { supabase } from './supabaseClient';
 
 const SupportersSidebar = lazy(() => import('./SupportersSidebar').then(m => ({ default: m.SupportersSidebar })));
@@ -186,72 +187,46 @@ export default function App() {
         />
       </div>
 
-      {/* HEADER — single full-width bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 h-[65px] relative flex items-center bg-black/20 backdrop-blur-sm border-b border-white/10 pointer-events-none">
-        {/* VI logo — centered on full viewport width */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <img
-            src="/a992d144-4edd-4397-bdae-5a039dcace5c.png"
-            alt="VI"
-            className="h-7 sm:h-9 lg:h-11 object-contain"
-          />
-        </div>
-
-        {/* Left + Right content row, starts after sidebar */}
+      {/* TOP HEADER PILL / NAV */}
+      <header className="fixed top-0 left-0 w-full z-50 flex justify-center py-4 px-8 pointer-events-none landscape:py-1">
         <div
-          className="relative flex-1 flex items-center justify-between pl-[78px] pr-3 md:pl-[88px] lg:pl-[78px] pointer-events-auto gap-2 z-10"
+          className="flex items-center gap-2 sm:gap-4 md:gap-8 lg:gap-32 bg-black/10 backdrop-blur-sm rounded-xl px-2 sm:px-6 md:px-8 py-2 sm:py-4 md:py-4 border border-white/10 pointer-events-auto landscape:px-6 landscape:py-2 landscape:gap-6"
           onClick={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
           onTouchEnd={(e) => e.stopPropagation()}
           onWheel={(e) => e.stopPropagation()}
         >
-          {/* LEFT: user pill + auth buttons */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {sessionUser && (
-              <div className="flex items-center gap-1 bg-white/10 border border-white/20 rounded-full px-2 py-1 shrink-0">
-                <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
-                  <User size={9} className="text-white" />
-                </div>
-                <span className="text-white text-[11px] font-semibold max-w-[70px] truncate">@{sessionUser}</span>
-              </div>
-            )}
+          {/* Navigation */}
+          <nav className="min-w-0 flex gap-2 sm:gap-4 md:gap-8 lg:gap-16 landscape:gap-4">
             <button
               onClick={() => { import('./haptics').then(m => m.Haptics.success()); setIsDonateOpen(true); }}
-              className="text-[11px] sm:text-sm font-black uppercase text-white hover:text-yellow-400 transition-colors [text-shadow:_2px_2px_0_rgb(0_0_0)]"
+              className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-yellow-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
             >
               TIP
             </button>
+
             {!sessionUser && (
               <>
-                <span className="text-white/30 text-xs select-none">|</span>
                 <button
                   onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signup'); setIsAuthModalOpen(true); }}
-                  className="text-[11px] sm:text-sm font-black uppercase text-white hover:text-cyan-400 transition-colors [text-shadow:_2px_2px_0_rgb(0_0_0)]"
+                  className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-cyan-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
                 >
                   SIGN UP
                 </button>
+
                 <button
                   onClick={() => { import('./haptics').then(m => m.Haptics.light()); setAuthMode('signin'); setIsAuthModalOpen(true); }}
-                  className="text-[11px] sm:text-sm font-black uppercase text-white hover:text-pink-400 transition-colors [text-shadow:_2px_2px_0_rgb(0_0_0)]"
+                  className="text-[10px] sm:text-sm md:text-xl lg:text-4xl xl:text-5xl font-black uppercase text-white hover:text-pink-400 transition-colors [text-shadow:_4px_4px_0_rgb(0_0_0)] landscape:text-lg"
                 >
                   SIGN IN
                 </button>
               </>
             )}
-          </div>
+          </nav>
 
-          {/* RIGHT: countdown + sign out */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Countdown — shrink-0 ensures it's never squeezed out of the flex row */}
+          <div className="shrink-0 border-l-2 md:border-l-4 border-white/50 pl-2 sm:pl-4 md:pl-8 flex items-center landscape:pl-4">
             <LaunchCountdown />
-            {sessionUser && (
-              <button
-                onClick={async () => { await supabase.auth.signOut(); setSessionUser(null); }}
-                className="flex items-center gap-1 bg-white/10 border border-white/20 rounded-full px-2 py-1 text-[11px] text-white/90 font-semibold hover:bg-white/20 hover:text-white transition-all"
-              >
-                <LogOut size={11} />
-                <span className="hidden sm:inline">Out</span>
-              </button>
-            )}
           </div>
         </div>
       </header>
@@ -267,6 +242,9 @@ export default function App() {
         onOpenNews={() => setIsNewsOpen(prev => !prev)}
         onOpenComingSoon={(title) => setComingSoonTitle(title)}
       />
+
+      {/* User bubble — compact, centered below header pill, sign-out in dropdown */}
+      {sessionUser && <UserBubble username={sessionUser} onSignOut={() => setSessionUser(null)} />}
 
       {/* RIGHT SIDE BUTTONS */}
       <div 

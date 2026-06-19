@@ -358,12 +358,6 @@ html, body, #root {
   overflow: hidden;
 }
 
-/* Dim the top header bar slightly when modals are open */
-.modal-open header {
-  opacity: 0.6;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
 
 /* ============================================
    LEFT SIDEBAR TOOLBAR - RESPONSIVE
@@ -385,7 +379,7 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 70px 8px 24px 8px;
+  padding: 8px 8px 24px 8px;
   overflow-y: auto;
   overflow-x: hidden;
   
@@ -414,7 +408,7 @@ html, body, #root {
   .left-sidebar {
     height: 100dvh;
     width: var(--toolbar-width-mobile);
-    padding: 70px 4px 6px;
+    padding: 56px 4px 6px;
     gap: 3px;
     bottom: 0;
     overflow-y: auto;

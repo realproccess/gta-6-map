@@ -26,12 +26,12 @@ export function UserBubble({ username, onSignOut }: UserBubbleProps) {
       <div className="relative flex justify-center">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-2 py-1 hover:bg-white/20 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
         >
-          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
-            <User size={12} className="text-white" />
+          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
+            <User size={10} className="text-white" />
           </div>
-          <span className="text-white text-sm font-semibold tracking-wide max-w-[120px] truncate">@{username}</span>
+          <span className="text-white text-xs font-semibold tracking-wide max-w-[100px] truncate">@{username}</span>
         </button>
 
         {isOpen && (
