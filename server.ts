@@ -11,17 +11,27 @@ const app = express();
 const PORT = 3000;
 
 // ── Fail-fast on missing required server secrets ──────────────────────────────
+const isDev = process.env.NODE_ENV !== 'production';
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('[startup] FATAL: VITE_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must both be set.');
+if (!supabaseUrl) {
+  console.error('[startup] FATAL: VITE_SUPABASE_URL must be set.');
   process.exit(1);
+}
+
+if (!supabaseServiceKey) {
+  if (isDev) {
+    console.warn('[startup] WARNING: SUPABASE_SERVICE_ROLE_KEY not set — Ko-fi webhook disabled in dev.');
+  } else {
+    console.error('[startup] FATAL: SUPABASE_SERVICE_ROLE_KEY must be set in production.');
+    process.exit(1);
+  }
 }
 
 // Service role key is required so the Ko-fi webhook can bypass RLS.
 // Never fall back to the anon key — that would silently break RLS enforcement.
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = supabaseServiceKey ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 // ── Security headers (helmet defaults cover CSP, HSTS, X-Frame-Options, etc.) ─
 app.use(helmet());
@@ -64,7 +74,7 @@ app.post('/api/webhook/kofi', async (req, res) => {
       console.warn('[kofi] WARNING: KOFI_VERIFICATION_TOKEN is not set. Webhook is unauthenticated.');
     }
 
-    if (payload.is_public === true) {
+    if (payload.is_public === true && supabase) {
       const { from_name, amount, message } = payload;
 
       const { error } = await supabase

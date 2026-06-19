@@ -114,11 +114,11 @@ export function CharactersModal({ isOpen, onClose }: { isOpen: boolean; onClose:
             <X size={16} />
           </button>
           
-          <div className="w-full flex-shrink-0 h-[40vh] md:h-[50vh] bg-black">
-            <img 
-              src={zoomedChar.imageUrl} 
-              alt={zoomedChar.name} 
-              className="w-full h-full object-contain"
+          <div className="w-full flex-shrink-0 h-[40vh] md:h-[50vh] bg-[#0f0c16]">
+            <img
+              src={zoomedChar.imageUrl}
+              alt={zoomedChar.name}
+              className="w-full h-full object-cover object-top"
             />
           </div>
           
@@ -176,7 +176,7 @@ export function CharactersModal({ isOpen, onClose }: { isOpen: boolean; onClose:
                 <img 
                   src={char.imageUrl} 
                   alt={char.name}
-                  className="w-full h-full object-contain opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
+                  className="w-full h-full object-cover object-top opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
                 />
                 
                 <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-widest border border-white/10 flex items-center gap-1">

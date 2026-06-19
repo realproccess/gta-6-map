@@ -78,11 +78,12 @@ export default function NewsletterModal({ isOpen, onClose }: NewsletterModalProp
 
         if (uploadError) throw uploadError;
 
-        const { data: publicUrlData } = supabase.storage
+        const { data: signedUrlData, error: signUrlError } = await supabase.storage
           .from('feedback-attachment')
-          .getPublicUrl(fileName);
-          
-        file_url = publicUrlData.publicUrl;
+          .createSignedUrl(fileName, 3600);
+
+        if (signUrlError) throw signUrlError;
+        file_url = signedUrlData.signedUrl;
       }
 
       const { error: dbError } = await supabase

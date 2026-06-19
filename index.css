@@ -1624,9 +1624,9 @@ html, body, #root {
 /* Fix the Image Cropping */
 .character-fullscreen-modal img {
     width: 100% !important;
-    max-height: 50vh !important; /* Never takes up more than half the screen */
-    object-fit: contain !important; /* CRITICAL: Forces full image to show without cropping */
-    background: #000 !important; /* Fills empty space if image is narrow */
+    max-height: 50vh !important;
+    object-fit: cover !important;
+    object-position: top !important;
 }
 
 /* Ensure Text Stays Below Image */

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, ImageOverlay, Marker, Popup, Polyline, Circle, useMapEvents, useMap, Tooltip } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L, { LatLngExpression } from 'leaflet';
-import { Pin, GameState } from '../types';
+import { Pin, GameState } from './types';
 import { CoordinateDisplay } from './CoordinateDisplay';
 import { AdvancedMapTooltip } from './AdvancedMapTooltip';
 // @ts-ignore
@@ -42,8 +42,21 @@ const createCustomClusterIcon = (cluster: any) => {
 function MapFitter({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
   useEffect(() => {
-    map.fitBounds(bounds);
-  }, [map, bounds]);
+    const b = L.latLngBounds(bounds as any);
+    const imageW = b.getEast() - b.getWest();
+    const imageH = b.getNorth() - b.getSouth();
+    const vw = map.getContainer().clientWidth;
+    const vh = map.getContainer().clientHeight;
+    if (!vw || !vh) {
+      map.fitBounds(bounds);
+      return;
+    }
+    // Cover mode: pick zoom level that fills the viewport in both directions
+    // so there are no black bars around the map image
+    const zoomW = Math.log2(vw / imageW);
+    const zoomH = Math.log2(vh / imageH);
+    map.setView([imageH / 2, imageW / 2], Math.max(zoomW, zoomH), { animate: false });
+  }, [map]);
   return null;
 }
 
