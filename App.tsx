@@ -4,7 +4,7 @@
  */
 
 import React, { useState, Suspense, lazy } from 'react';
-import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Search, Plus, Minus, Ruler, Edit2, RotateCcw, Trash2, Settings, Heart, Coffee, Mail, Share2 } from 'lucide-react';
 import { Analytics, track } from '@vercel/analytics/react';
 import { MapCanvas } from './MapCanvas';
 
@@ -61,6 +61,23 @@ export default function App() {
   const [comingSoonTitle, setComingSoonTitle] = useState<string | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
   const [sessionUser, setSessionUser] = useState<string | null>(null);
+  const [copiedToast, setCopiedToast] = useState(false);
+
+  const handleShare = async () => {
+    import('./haptics').then(m => m.Haptics.success());
+    track('share_clicked');
+    const shareData = {
+      title: 'LeonidaMap VI - GTA 6 Map Explorer',
+      text: 'Check out leonidamap6.com - explore the GTA 6 map before launch! 🗺️',
+      url: 'https://leonidamap6.com',
+    };
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try { await navigator.share(shareData); return; } catch { /* user cancelled */ }
+    }
+    await navigator.clipboard.writeText('https://leonidamap6.com');
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 2500);
+  };
 
   const isAnyModalOpen = isAuthModalOpen || isDonateOpen || isCharactersOpen || isNewsOpen || isNewsletterOpen || !!comingSoonTitle || isSettingsOpen || isSupportersOpen;
 
@@ -255,8 +272,17 @@ export default function App() {
         onTouchEnd={(e) => e.stopPropagation()}
         onWheel={(e) => e.stopPropagation()}
       >
+        {/* SHARE BUTTON */}
+        <button
+          onClick={handleShare}
+          className="group shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:scale-110 transition-transform haptic-btn"
+          title="Share LeonidaMap VI"
+        >
+          <Share2 size={18} className="text-white/90 group-hover:text-purple-400 transition-colors" />
+        </button>
+
         {/* CONTACT BUTTON */}
-        <button 
+        <button
           onClick={() => { import('./haptics').then(m => m.Haptics.light()); setIsNewsletterOpen(true); }}
           className="group shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:scale-110 transition-transform haptic-btn"
           title="Contact"
@@ -324,6 +350,14 @@ export default function App() {
           onClose={() => setIsNewsletterOpen(false)}
         />}
       </Suspense>
+
+      {/* COPIED TOAST */}
+      {copiedToast && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-[0_8px_32px_rgba(168,85,247,0.5)] animate-in slide-in-from-bottom-4 duration-300">
+          <Share2 size={14} />
+          Link copied — share the map!
+        </div>
+      )}
 
       <Analytics />
     </div>
