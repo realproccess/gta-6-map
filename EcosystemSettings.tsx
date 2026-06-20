@@ -220,6 +220,17 @@ export default function EcosystemSettings({ isOpen, onClose, onOpenDonate }: Set
               <span className="text-gray-700">•</span>
               <button onClick={() => setShowTos(true)} className="legal-link-btn">Terms of Service</button>
             </div>
+
+            {/* LEGAL LINKS */}
+            <div className="border-t border-white/20 mt-6 pt-4">
+              <p className="text-xs text-white/60 mb-3">Legal</p>
+              <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300 mb-2">
+                → Privacy Policy
+              </a>
+              <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300">
+                → Terms of Service
+              </a>
+            </div>
           </div>
 
         </div>
