@@ -227,8 +227,11 @@ export default function EcosystemSettings({ isOpen, onClose, onOpenDonate }: Set
               <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300 mb-2">
                 → Privacy Policy
               </a>
-              <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300">
+              <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300 mb-2">
                 → Terms of Service
+              </a>
+              <a href="/about" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/60 hover:text-pink-300">
+                → About LeonidaMap VI
               </a>
             </div>
           </div>
